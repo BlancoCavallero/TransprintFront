@@ -1,0 +1,64 @@
+
+:root {
+  /* Tipografía */
+  --font-primary: 'Arial', sans-serif;      /* Fuente principal para textos */
+  --font-secondary: 'Roboto', sans-serif;   /* Fuente secundaria opcional para títulos */
+
+  /* Colores del logo */
+  --color-primary: #39b54a;    /* Verde principal */
+  --color-primary-dark: #2e9140; /* Verde oscuro */
+  --color-secondary: #4b0082;  /* Morado */
+  --color-secondary-light: #6a1b9a; /* Morado claro / acento */
+  --color-white: #ffffff;      /* Blanco para fondos o texto */
+
+  /* Colores neutros */
+  --color-background: #f4f4f4;  /* Gris muy claro para fondo general */
+  --color-text-primary: #111111; /* Texto principal */
+  --color-text-secondary: #555555; /* Texto secundario */
+  --color-border: #dddddd;      /* Bordes */
+  --color-shadow: rgba(0,0,0,0.1); /* Sombras */
+}
+
+/* Reset básico */
+*, ::after, ::before{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Encabezados */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-secondary);
+  color: var(--color-text-primary);
+}
+
+/* Enlaces */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Botones genéricos */
+button {
+  font-family: var(--font-primary);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: var(--color-primary-dark);
+}
