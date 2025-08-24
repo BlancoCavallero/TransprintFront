@@ -51,14 +51,6 @@ a:hover {
 /* Botones genéricos */
 button {
   font-family: var(--font-primary);
-  background-color: var(--color-primary);
-  color: var(--color-white);
   border: none;
-  padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 4px;
-}
-
-button:hover {
-  background-color: var(--color-primary-dark);
 }
