@@ -1,0 +1,155 @@
+.login__container {
+    height: 100vh;
+    background: linear-gradient(135deg, #2a1655, #4cc026);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    font-family: 'Encode Sans', sans-serif;
+  }
+  
+  /* Contenedor que agrupa el formulario y la imagen */
+  .login__content {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 
+            0 0 20px rgba(76, 192, 38, 0.6);
+    
+  }
+  
+  /* Formulario de Login */
+  .login__form {
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    min-width: 300px;
+    background-color: white;
+    padding: 2rem;
+    position: relative;
+  }
+  
+  /* Estilos para los grupos de formulario */
+  .login__form_section{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .login__input_container {
+    position: relative;
+  }
+  
+  .login__input_icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: black;
+  }
+  
+  .login__input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    border: 2px solid black;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: all 0.3s;
+    font-size: 1rem;
+  }
+  
+  .login__input:focus {
+    border-color: green;
+  }
+  
+  .login__input_container label {
+    position: absolute;
+    left: 2.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    transition: all 0.3s ease;
+    color: rgb(1, 88, 1);
+    pointer-events: none;
+  }
+  
+  .login__input:focus + label,
+  .login__input_container label.active {
+    top: 0;
+    left: 0;
+    transform: translateY(-120%);
+    padding: 0 0.5rem;
+    
+  }
+  
+  /* Estilo para los extras del formulario */
+  .login__remember {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .login__remember_label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4b5563;
+    cursor: pointer;
+  }
+  
+  .login__remember_input{
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    border: 2px solid red;
+    cursor: pointer;
+    accent-color: black;
+  }
+  
+  .login__forgot_password{
+    color: black;
+    font-size: 0.875rem;
+    transition: color 0.5s;
+    border: none;
+    background:none;
+    cursor: pointer;
+  }
+  
+  .login__forgot_password:hover {
+    color: peru;
+    text-decoration: underline;
+  }
+  
+  .login__button {
+    font-family: 'Encode Sans', sans-serif;
+    width: 100%;
+    padding: 0.75rem;
+    background: green;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    letter-spacing: .05rem;
+  }
+  
+  .login__button:hover {
+    background: rgb(0, 104, 0);
+  }
+  
+  /* Estilo para la imagen dentro del login */
+  .login__icon {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  @media (width<=376px){
+    .login__forgot_password{
+        margin-left:60px
+    }
+  }
