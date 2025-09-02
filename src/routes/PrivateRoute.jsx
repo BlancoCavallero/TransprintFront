@@ -4,9 +4,9 @@ import { UsuarioContext } from "../context/UsuarioContext";
 
 
 const PrivateRoute = () => {
-  const { isAuthorized } = useContext(UsuarioContext);
+  const { isAuthenticated } = useContext(UsuarioContext);
 
-  return isAuthorized ? <Outlet /> : <Navigate to="/login" replace />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;

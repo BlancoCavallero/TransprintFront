@@ -1,30 +1,46 @@
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import { UsuarioContext } from "./UsuarioContext";
-
+import { useReducer } from "react";
+import { types } from "../utils/types";
 
 // Un ejemplo de Provider para version totalmente inicial sin tokens.
-
-export const UsuarioProvider = ({ children }) => {
-  const [isAuthorized, setIsAuthorized] = useState(false);
-
-
-  useEffect(() => {
-    const storedAuth = localStorage.getItem("isAuthorized");
-    if (storedAuth === "true") {
-      setIsAuthorized(true);
+const init = () => {
+    const valor = localStorage.getItem("isAuthenticated")
+    return{
+      isAuthenticated:!!valor
     }
-  }, []);
+}
 
-  useEffect(() => {
-    localStorage.setItem("isAuthorized", isAuthorized);
-  }, [isAuthorized]);
+const reducer = (state={},action) => {
+    switch(action.type){
+        case(types.login) : 
+            return {
+              isAuthenticated:true
+            }
+        case(types.logout) :
+            return {
+              isAuthenticated:false
+            }
+        default: 
+            return state
+    }
+}
 
-  const login = () => setIsAuthorized(true);
-  const logout = () => setIsAuthorized(false);
+export const UsuarioProvider = ({children}) => { 
+    const appLogin = () => {
+        localStorage.setItem("isAuthenticated",true)
+        dispatch({type : types.login})
+    }
 
+    const appLogout =() => {
+        localStorage.removeItem("isAuthenticated")
+        dispatch({type:types.logout})
+    }
+
+    const [state,dispatch] = useReducer(reducer,{},init)
   return (
-    <UsuarioContext.Provider value={{ isAuthorized, login, logout }}>
-      {children}
+    <UsuarioContext.Provider value={{...state ,appLogin, appLogout}}>
+        {children}
     </UsuarioContext.Provider>
-  );
-};
+  )
+}
