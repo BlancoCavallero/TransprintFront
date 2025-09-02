@@ -13,19 +13,22 @@ export const Login = () => {
     rememberMe: false
   });
 
-  const { login } = useAuth();
+  const [modalUsername, setModalUsername] = useState('');
+  const {appLogin } = useAuth();
+
+  //Navegacion real para cuando funcione el backend
   const navigate = useNavigate();
 
-//   useEffect(() => {
-//     const rememberedUser = localStorage.getItem("rememberedUser");
-//     if (rememberedUser) {
-//       setFormData(prev => ({
-//         ...prev,
-//         username: rememberedUser,
-//         rememberMe: true,
-//       }));
-//     }
-//   }, []);
+  useEffect(() => {
+    const rememberedUser = localStorage.getItem("rememberedUser");
+    if (rememberedUser) {
+      setFormData(prev => ({
+        ...prev,
+        username: rememberedUser,
+        rememberMe: true,
+      }));
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,48 +43,47 @@ export const Login = () => {
       });
       return;
     }
-  
-    try {
-      // Llamada al backend para iniciar sesión
-      const response = await loginApp(username, password);
-  
-      if (response && response.token) {
-        // Pasamos el token al contexto de autenticación
-        login(response.token);
-  
-        // Redirigir directamente al dashboard
-        navigate("/dashboard");
-      } else {
-        throw new Error("No se recibió un token válido.");
-      }
-    } catch (error) {
-      // Manejar errores específicos del backend
-      const errorMessage = error.response?.data?.message || "Usuario o contraseña incorrectos.";
+
+    // Simulación de autenticación básica
+
+     if(username === "admin" && password === "1234" || username === "user" && password === "1234"){
+      appLogin()
+    }else{
       Swal.fire({
         icon: "error",
-        title: "Error en el inicio de sesión",
-        text: errorMessage,
-      });
-  
-      // Limpiar el formulario en caso de error
-      setFormData({
-        username: "",
-        password: "",
-        rememberMe: formData.rememberMe, // Mantener el estado de "Recuérdame"
+        title: "Contraseña incorrecta",
+        text: "Haz introducido mal el usuario o contraseña.",
       });
     }
+  
+    // try {
+      
+    //   const response = await loginApp(username, password);
+  
+    //   if (response && response.token) {
+    //     login(response.token);
+    //     navigate("/dashboard");
+    //   } else {
+    //     throw new Error("No se recibió un token válido.");
+    //   }
+    // } catch (error) {
+    //   // Manejar errores específicos del backend
+    //   const errorMessage = error.response?.data?.message || "Usuario o contraseña incorrectos.";
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Error en el inicio de sesión",
+    //     text: errorMessage,
+    //   });
+  
+    //   // Limpiar el formulario en caso de error
+    //   setFormData({
+    //     username: "",
+    //     password: "",
+    //     rememberMe: formData.rememberMe, // Mantener el estado de "Recuérdame"
+    //   });
+    // }
   };
   
-  
-  
-  
-  
-  
-
-  
-  
-  
-
   const handleRememberMe = (username, checked) => {
     if (checked) {
       localStorage.setItem("rememberedUser", username);
@@ -104,6 +106,9 @@ export const Login = () => {
       return newState;
     });
   };
+
+
+  // Manejo de "Olvidé mi contraseña" sin implementacion
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
