@@ -13,6 +13,7 @@ import { Viaje } from "../pages/Viaje/Viaje";
 import { Vehiculo } from "../pages/Vehiculo/Vehiculo";
 import { Cliente } from "../pages/Cliente/Cliente";
 import { Dashboard } from "../pages/Dashboard/Dashboard";
+import PrivateLayout from "../layout/PrivateLayout";
 
 export const AppRoutes = () => {
   return (
@@ -24,19 +25,19 @@ export const AppRoutes = () => {
       </Route>
 
       {/* Páginas privadas */}
-      <Route element={<PrivateRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/chofer" element={<Chofer />} />
-        <Route path="/mantenimiento" element={<Mantenimiento />} />
-        <Route path="/usuario" element={<Usuario />} />
-        <Route path="/reporte" element={<Reporte />} />
-        <Route path="/viaje" element={<Viaje />} />
-        <Route path="/vehiculo" element={<Vehiculo />} />
-        <Route path="/cliente" element={<Cliente />} />
-         <Route path="/*" element={<Navigate to="/dashboard" />} />
+      <Route element={<PrivateLayout />}>
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/chofer" element={<Chofer />} />
+          <Route path="/mantenimiento" element={<Mantenimiento />} />
+          <Route path="/usuario" element={<Usuario />} />
+          <Route path="/reporte" element={<Reporte />} />
+          <Route path="/viaje" element={<Viaje />} />
+          <Route path="/vehiculo" element={<Vehiculo />} />
+          <Route path="/cliente" element={<Cliente />} />
+          <Route path="/*" element={<Navigate to="/dashboard" />} />
+        </Route>
       </Route>
-            
     </Routes>
   );
 };
-

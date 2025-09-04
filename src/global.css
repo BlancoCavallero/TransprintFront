@@ -17,6 +17,26 @@
   --color-text-secondary: #555555; /* Texto secundario */
   --color-border: #dddddd;      /* Bordes */
   --color-shadow: rgba(0,0,0,0.1); /* Sombras */
+
+
+  /* MAS COLORES QUE TALVEZ DEBO QUITAR*/
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-grey: #838383;
+  --color-lightblue: #00aec3;
+  --color-pink: #e81f76;
+  --color-green: #22a954;
+  --color-blue: #1f3464;
+  --color-grey-section: #e8e4e1;
+  --color-red: red;
+  --color-lightblue-btn: #00aabf;
+  --color-purple: #592673;
+  --color-grad-lightblue: #a3d8e7;
+
+  /* Fuentes */
+  --font-primary: "Encode Sans", sans-serif;
+  --font-secondary: "Encode Sans", sans-serif;
 }
 
 /* Reset básico */
@@ -54,3 +74,11 @@ button {
   border: none;
   cursor: pointer;
 }
+
+.app__container-global {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
