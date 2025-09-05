@@ -1,52 +1,68 @@
 import { SidebarList } from "./SidebarList/SidebarList";
 import { Link } from "react-router-dom";
 import "./sidebar.css";
-import {
-  FaBullhorn,
+import { 
   FaChartBar,
-  FaComments,
-  FaFolderOpen,
-  FaUserCircle,
-  FaUserCog,
+  FaTruck,    
+  FaComments,      
+  FaBullhorn,      
+  FaFolderOpen,    
+  FaUserCircle,    
+  FaUserCog        
 } from "react-icons/fa";
+import { IoMdSettings } from "react-icons/io";
+import { FaHouse, FaPerson,FaPersonCircleCheck} from "react-icons/fa6";
+import { GiPathDistance } from "react-icons/gi";
 
 const menuItems = [
   {
     id: 1,
-    icon: <FaChartBar className="icon-violet" />,
+    icon: <FaHouse className="icon-violet" />,
     text: "Dashboard",
-    path: "/gestion-dashboard",
+    path: "/dashboard",
   },
   {
     id: 2,
-    icon: <FaComments className="icon-violet" />,
-    text: "Consultas",
-    path: "/gestion-consultas",
+    icon: <FaPerson className="icon-violet" />,
+    text: "Clientes",
+    path: "/cliente",
   },
   {
     id: 3,
-    icon: <FaBullhorn className="icon-violet" />,
-    text: "Reclamos",
-    path: "/gestion-reclamos",
+    icon: <FaTruck className="icon-violet" />,
+    text: "Vehículos",
+    path: "/vehiculo",
   },
   {
     id: 4,
-    icon: <FaFolderOpen className="icon-violet" />,
-    text: "Denuncias",
-    path: "/gestion-denuncias",
+    icon: <FaPersonCircleCheck className="icon-violet" />,
+    text: "Choferes",
+    path: "/chofer",
   },
   {
-    id: 9,
-    icon: <FaUserCircle className="icon-violet" />,
-    text: "Gestión de Información",
-    path: "/gestion-informacion",
+    id: 5,
+    icon: <GiPathDistance className="icon-violet" />,
+    text: "Viajes",
+    path: "/viaje",
   },
   {
-    id: 10,
+    id: 6,
+    icon: <IoMdSettings className="icon-violet" />,
+    text: "Mantenimiento",
+    path: "/mantenimiento",
+  },
+  {
+    id: 7,
     icon: <FaUserCog className="icon-violet" />,
-    text: "Gestión de Usuarios",
-    path: "/gestion-administracion",
+    text: "Usuarios",
+    path: "/usuario",
   },
+  {
+    id: 8,
+    icon: <FaChartBar className="icon-violet" />,
+    text: "Reportes",
+    path: "/reporte",
+  }
 ];
 
 const Sidebar = ({ isCollapsed, toggleSidebar, isMobile, user }) => {
