@@ -1,6 +1,3 @@
-import { backend_url } from '../configuration/app.config';
-import axios from 'axios';
-
 import axios from "axios";
 import { backend_url } from "../configuration/app.config"; 
 
