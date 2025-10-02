@@ -20,10 +20,10 @@ export const postCliente = async (data) => {
   return await postGeneric("/cliente", data, getHeaders());
 };
 
-export const putClientes = async (id, data) => {
+export const putCliente = async (id, data) => {
   return await putGeneric(`/cliente/${id}`, data, getHeaders());
 };
 
-export const deleteClientes = async (id) => {
+export const deleteCliente = async (id) => {
   return await await deleteGeneric(`/cliente/${id}`, getHeaders());
 };
