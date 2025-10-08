@@ -1,7 +1,6 @@
 import axios from "axios";
-import { backend_url } from "../configuration/app.config"; 
+import { backend_url } from "../configuration/app.config";
 
-// Cliente base
 const api = axios.create({
   baseURL: `${backend_url}/api`,
   headers: {
@@ -12,68 +11,44 @@ const api = axios.create({
 // GET (listado o con filtros)
 export const getGeneric = async (endpoint, params = {}, headers = {}) => {
   if (!endpoint) throw new Error("Endpoint no definido");
-
-  try {
-    const response = await api.get(endpoint, { params, headers });
-    return response.data;
-  } catch (error) {
-    console.error(`Error en getGeneric (${endpoint}):`, error.response?.data || error.message);
-    throw error;
-  }
+  const response = await api.get(endpoint, { params, headers });
+  return response.data;
 };
 
 // GET por ID
-export const getByIdGeneric = async (endpoint, id, headers = {}, params = {}) => {
-  if (!endpoint) throw new Error("Endpoint no definido");
-  if (!id) throw new Error("ID no definido");
-
-  try {
-    const response = await api.get(`${endpoint}/${id}`, { headers, params });
-    return response.data;
-  } catch (error) {
-    console.error(`Error en getByIdGeneric (${endpoint}/${id}):`, error.response?.data || error.message);
-    throw error;
-  }
+export const getByIdGeneric = async (
+  endpoint,
+  id,
+  headers = {},
+  params = {}
+) => {
+  if (!endpoint || !id) throw new Error("Endpoint o ID no definido");
+  const response = await api.get(`${endpoint}/${id}`, { headers, params });
+  return response.data;
 };
 
 // POST
-export const postGeneric = async (endpoint, data, headers = {}, params = {}) => {
+export const postGeneric = async (
+  endpoint,
+  data,
+  headers = {},
+  params = {}
+) => {
   if (!endpoint) throw new Error("Endpoint no definido");
-
-  try {
-    const response = await api.post(endpoint, data, { headers, params });
-    return response.data;
-  } catch (error) {
-    console.error(`Error en postGeneric (${endpoint}):`, error.response?.data || error.message);
-    throw error;
-  }
+  const response = await api.post(endpoint, data, { headers, params });
+  return response.data;
 };
 
 // PUT
-export const putGeneric = async (endpoint, id, data, headers = {}, params = {}) => {
+export const putGeneric = async (endpoint, data, headers = {}, params = {}) => {
   if (!endpoint) throw new Error("Endpoint no definido");
-  if (!id) throw new Error("ID no definido");
-
-  try {
-    const response = await api.put(`${endpoint}/${id}`, data, { headers, params });
-    return response.data;
-  } catch (error) {
-    console.error(`Error en putGeneric (${endpoint}/${id}):`, error.response?.data || error.message);
-    throw error;
-  }
+  const response = await api.put(endpoint, data, { headers, params });
+  return response.data;
 };
 
 // DELETE
-export const deleteGeneric = async (endpoint, id, headers = {}, params = {}) => {
+export const deleteGeneric = async (endpoint, headers = {}, params = {}) => {
   if (!endpoint) throw new Error("Endpoint no definido");
-  if (!id) throw new Error("ID no definido");
-
-  try {
-    const response = await api.delete(`${endpoint}/${id}`, { headers, params });
-    return response.data;
-  } catch (error) {
-    console.error(`Error en deleteGeneric (${endpoint}/${id}):`, error.response?.data || error.message);
-    throw error;
-  }
+  const response = await api.delete(endpoint, { headers, params });
+  return response.data;
 };
-

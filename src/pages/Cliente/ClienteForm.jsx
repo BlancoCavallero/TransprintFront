@@ -24,7 +24,7 @@ export const ClienteForm = ({
   onOpenChange,
   onSubmit,
   defaultValues,
-  isLoading,
+  isLoading = false,
   mode = 'create', // 'create' o 'edit'
 }) => {
   const form = useForm({

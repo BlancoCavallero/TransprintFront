@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import { useCliente } from '../../hooks/entities/useCliente';
 import { ClienteTable } from './ClienteTable';
 import { ClienteForm } from './ClienteForm';
