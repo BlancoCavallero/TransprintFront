@@ -1,9 +1,16 @@
+//USO REAL
+// import {
+//   getCliente,
+//   postCliente,
+//   putCliente,
+//   deleteCliente,
+// } from "../../services/clienteService";
 import {
   getCliente,
   postCliente,
   putCliente,
   deleteCliente,
-} from "../../services/clienteService";
+} from "../../services/mock/mockApi"; //USO MOCK
 import { useState, useEffect, useCallback } from "react";
 
 export const useCliente = () => {
@@ -102,9 +109,6 @@ export const useCliente = () => {
     refetch: fetchClientes,
   };
 };
-
-
-
 
 // import { useParametrosGenerales } from "../useParametrosGenerales";
 

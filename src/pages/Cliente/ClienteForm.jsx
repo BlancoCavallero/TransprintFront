@@ -18,6 +18,21 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+
+// Función auxiliar para formatear fecha a formato YYYY-MM-DD
+const formatDateForInput = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+};
+
+// Función auxiliar para convertir fecha de input a ISO string
+const formatDateToISO = (dateString) => {
+  if (!dateString) return new Date().toISOString();
+  const date = new Date(dateString + 'T00:00:00');
+  return date.toISOString();
+};
 
 export const ClienteForm = ({
   open,
@@ -28,16 +43,44 @@ export const ClienteForm = ({
   mode = 'create', // 'create' o 'edit'
 }) => {
   const form = useForm({
-    defaultValues: defaultValues || {
+    defaultValues: {
       nombre: '',
       email: '',
       telefono: '',
-      direccion: '',
+      empresa: '',
+      fechaCreacion: formatDateForInput(new Date().toISOString()),
     },
   });
 
+  // Actualizar formulario cuando cambian los defaultValues (al editar)
+  useEffect(() => {
+    if (open && defaultValues && mode === 'edit') {
+      form.reset({
+        nombre: defaultValues.nombre || '',
+        email: defaultValues.email || '',
+        telefono: defaultValues.telefono || '',
+        empresa: defaultValues.empresa || '',
+        fechaCreacion: formatDateForInput(defaultValues.fechaCreacion) || formatDateForInput(new Date().toISOString()),
+      });
+    } else if (open && mode === 'create') {
+      form.reset({
+        nombre: '',
+        email: '',
+        telefono: '',
+        empresa: '',
+        fechaCreacion: formatDateForInput(new Date().toISOString()),
+      });
+    }
+  }, [open, defaultValues, mode, form]);
+
   const handleSubmit = async (data) => {
-    const result = await onSubmit(data);
+    // Convertir la fecha a ISO string
+    const dataWithFormattedDate = {
+      ...data,
+      fechaCreacion: formatDateToISO(data.fechaCreacion),
+    };
+
+    const result = await onSubmit(dataWithFormattedDate);
     if (result?.success) {
       form.reset();
       onOpenChange(false);
@@ -63,7 +106,13 @@ export const ClienteForm = ({
             <FormField
               control={form.control}
               name="nombre"
-              rules={{ required: 'El nombre es requerido' }}
+              rules={{ 
+                required: 'El nombre es requerido',
+                minLength: {
+                  value: 2,
+                  message: 'El nombre debe tener al menos 2 caracteres'
+                }
+              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nombre</FormLabel>
@@ -99,7 +148,13 @@ export const ClienteForm = ({
             <FormField
               control={form.control}
               name="telefono"
-              rules={{ required: 'El teléfono es requerido' }}
+              rules={{ 
+                required: 'El teléfono es requerido',
+                minLength: {
+                  value: 8,
+                  message: 'El teléfono debe tener al menos 8 caracteres'
+                }
+              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Teléfono</FormLabel>
@@ -113,12 +168,35 @@ export const ClienteForm = ({
 
             <FormField
               control={form.control}
-              name="direccion"
+              name="empresa"
+              rules={{
+                required: 'La empresa es requerida'
+              }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dirección</FormLabel>
+                  <FormLabel>Empresa</FormLabel>
                   <FormControl>
-                    <Input placeholder="Calle Falsa 123" {...field} />
+                    <Input placeholder="Empresa SRL" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="fechaCreacion"
+              rules={{
+                required: 'La fecha de creación es requerida'
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Fecha de Creación</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="date" 
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
