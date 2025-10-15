@@ -80,7 +80,7 @@ export const Chofer = () => {
     <div className="">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">chofer</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Chofer</h1>
           <p className="text-muted-foreground">
             Gestiona todos tus chofer desde aquí
           </p>

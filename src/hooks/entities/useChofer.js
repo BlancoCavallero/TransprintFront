@@ -3,10 +3,10 @@ import {
   postChofer,
   putChofer,
   deleteChofer,
-} from "../../services/mock/mockApi"; //USO MOCK
+} from "../../services/choferService";
 import { useState, useEffect, useCallback } from "react";
 
-export const useCliente = () => {
+export const useChofer = () => {
   const [chofer, setChofer] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
