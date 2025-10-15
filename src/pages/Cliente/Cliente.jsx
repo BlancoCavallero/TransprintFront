@@ -77,7 +77,7 @@ export const Cliente = () => {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
