@@ -1,5 +1,5 @@
 import axios from "axios";
-import { backend_url } from "../../configuration/app.config";
+import { backend_url } from "../configuration/app.config";
 
 export const loginApp = async (username, password) => {
   try {
@@ -27,7 +27,6 @@ export const loginApp = async (username, password) => {
 
 export const logoutApp = async () => {
   try {
-
     const token = localStorage.getItem("access_token");
 
     if (!token) {
@@ -35,9 +34,8 @@ export const logoutApp = async () => {
       return;
     }
 
-    localStorage.removeItem("access_token"); 
+    localStorage.removeItem("access_token");
   } catch (error) {
     console.error("🚨 Error en el logout:", error.response?.data || error);
   }
 };
-

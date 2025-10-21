@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 export const Cliente = () => {
   const {
@@ -28,10 +29,12 @@ export const Cliente = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCliente, setSelectedCliente] = useState(null);
+  const {user } =useAuth();
 
   const handleEditClick = (cliente) => {
     setSelectedCliente(cliente);
     setIsEditDialogOpen(true);
+    console.log("Usuario en Cliente.jsx:", user);
   };
 
   const handleDeleteClick = (cliente) => {

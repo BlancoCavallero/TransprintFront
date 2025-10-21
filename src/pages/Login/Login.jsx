@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { FaUser, FaLock } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useAuth } from "../../hooks/useAuth";
+import { loginApp } from "../../services/authService";
 import logoTransprint from "../../assets/images/logoTransprint.png"
+
+
 import "./Login.css";
 
 export const Login = () => {
@@ -14,7 +17,6 @@ export const Login = () => {
   });
 
   const [modalUsername, setModalUsername] = useState('');
-  const {appLogin } = useAuth();
 
   //Navegacion real para cuando funcione el backend
   const navigate = useNavigate();
@@ -43,45 +45,33 @@ export const Login = () => {
       });
       return;
     }
-
-    // Simulación de autenticación básica
-
-     if(username === "admin" && password === "1234" || username === "user" && password === "1234"){
-      appLogin()
-    }else{
+  
+    try {
+      
+      const response = await loginApp(username, password);
+      console.log("Respuesta del login:", response);
+      if (response) {
+        appLogin(response);
+        navigate("/dashboard");
+      } else {
+        throw new Error("No se recibió un token válido.");
+      }
+    } catch (error) {
+      // Manejar errores específicos del backend
+      const errorMessage = error.response?.data?.message || "Usuario o contraseña incorrectos.";
       Swal.fire({
         icon: "error",
-        title: "Contraseña incorrecta",
-        text: "Haz introducido mal el usuario o contraseña.",
+        title: "Error en el inicio de sesión",
+        text: errorMessage,
+      });
+  
+      // Limpiar el formulario en caso de error
+      setFormData({
+        username: "",
+        password: "",
+        rememberMe: formData.rememberMe, // Mantener el estado de "Recuérdame"
       });
     }
-  
-    // try {
-      
-    //   const response = await loginApp(username, password);
-  
-    //   if (response && response.token) {
-    //     login(response.token);
-    //     navigate("/dashboard");
-    //   } else {
-    //     throw new Error("No se recibió un token válido.");
-    //   }
-    // } catch (error) {
-    //   // Manejar errores específicos del backend
-    //   const errorMessage = error.response?.data?.message || "Usuario o contraseña incorrectos.";
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Error en el inicio de sesión",
-    //     text: errorMessage,
-    //   });
-  
-    //   // Limpiar el formulario en caso de error
-    //   setFormData({
-    //     username: "",
-    //     password: "",
-    //     rememberMe: formData.rememberMe, // Mantener el estado de "Recuérdame"
-    //   });
-    // }
   };
   
   const handleRememberMe = (username, checked) => {
