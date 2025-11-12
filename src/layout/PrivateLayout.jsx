@@ -51,7 +51,7 @@ const PrivateLayout = () => {
             isCollapsed={sidebarCollapsed}
             isMobile={isMobile}
           />
-       <main className={`${isWelcomePage ? "no-padding" : "main-content"}`}>
+       <main className="main-content">
         <Outlet />
       </main>
         </div>
