@@ -17,6 +17,7 @@ export const Login = () => {
   });
 
   const [modalUsername, setModalUsername] = useState('');
+  const {appLogin} = useAuth();
 
   //Navegacion real para cuando funcione el backend
   const navigate = useNavigate();
