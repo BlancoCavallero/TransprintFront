@@ -6,6 +6,29 @@ import {
   deleteUsuario,
 } from "../../services/usuarioService";
 
+const normalizeUser = (user) => {
+  if (!user) return user;
+  const roleFromArray = Array.isArray(user.roles) ? user.roles[0] : undefined;
+
+  return {
+    ...user,
+    user_id: user.user_id ?? user.id,
+    role: user.role ?? roleFromArray ?? "",
+  };
+};
+
+const extractUsers = (response) => {
+  const list = Array.isArray(response)
+    ? response
+    : Array.isArray(response?.data)
+      ? response.data
+      : Array.isArray(response?.data?.data)
+        ? response.data.data
+        : [];
+
+  return list.map(normalizeUser);
+};
+
 export const useUsuario = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +42,7 @@ export const useUsuario = () => {
     setError(null);
     try {
       const response = await getUsuario();
-      setUsuarios(Array.isArray(response) ? response : response.data || []);
+      setUsuarios(extractUsers(response));
     } catch (err) {
       setError(err.message || "Error desconocido");
       console.error("Error al cargar usuarios:", err);
@@ -36,14 +59,25 @@ export const useUsuario = () => {
     setLoadingCreate(true);
     setError(null);
     try {
+      console.log("Creating user with data:", data);
       const response = await postUsuario(data);
-      const nuevo = response.data;
+      console.log("Create response:", response);
+      const nuevo = normalizeUser(
+        response?.data ?? response?.usuario ?? response,
+      );
+
       if (nuevo) setUsuarios((prev) => [...prev, nuevo]);
       return { success: true, data: nuevo };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
       console.error("Error al crear usuario:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingCreate(false);
     }
@@ -53,16 +87,31 @@ export const useUsuario = () => {
     setLoadingUpdate(true);
     setError(null);
     try {
-      const response = await putUsuario(id, data);
-      const actualizado = response.data;
+      const payload = { ...data };
+      console.log("Updating user ID:", id);
+      console.log("Payload before password check:", payload);
+      if (!payload?.password) delete payload.password;
+
+      const response = await putUsuario(id, payload);
+      console.log("Update response:", response);
+      const actualizado = normalizeUser(response?.data ?? response);
+
       if (actualizado) {
-        setUsuarios((prev) => prev.map((u) => (u.id === id ? actualizado : u)));
+        setUsuarios((prev) =>
+          prev.map((u) => (u.user_id === id ? actualizado : u)),
+        );
       }
       return { success: true, data: actualizado };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
       console.error("Error al actualizar usuario:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingUpdate(false);
     }
@@ -72,13 +121,20 @@ export const useUsuario = () => {
     setLoadingDelete(true);
     setError(null);
     try {
+      console.log("Deleting user ID:", id);
       await deleteUsuario(id);
-      setUsuarios((prev) => prev.filter((u) => u.id !== id));
+      setUsuarios((prev) => prev.filter((u) => u.user_id !== id));
       return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
       console.error("Error al eliminar usuario:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingDelete(false);
     }

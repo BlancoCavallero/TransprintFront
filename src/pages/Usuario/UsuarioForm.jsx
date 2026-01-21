@@ -19,27 +19,42 @@ import {
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export const UsuarioForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoading = false, mode = 'create' }) => {
   const form = useForm({
     defaultValues: {
-      nombre: '',
+      username: '',
       email: '',
-      telefono: '',
-      rol: '',
+      password: '',
+      nombre_completo: '',
+      role: 'Empleado',
     },
   });
 
   useEffect(() => {
     if (open && defaultValues && mode === 'edit') {
       form.reset({
-        nombre: defaultValues.nombre || '',
+        username: defaultValues.username || '',
         email: defaultValues.email || '',
-        telefono: defaultValues.telefono || '',
-        rol: defaultValues.rol || '',
+        password: '',
+        nombre_completo: defaultValues.nombre_completo || '',
+        role: defaultValues.role || defaultValues.roles?.[0] || 'Empleado',
       });
     } else if (open && mode === 'create') {
-      form.reset({ nombre: '', email: '', telefono: '', rol: '' });
+      form.reset({
+        username: '',
+        email: '',
+        password: '',
+        nombre_completo: '',
+        role: 'Empleado',
+      });
     }
   }, [open, defaultValues, mode, form]);
 
@@ -63,11 +78,21 @@ export const UsuarioForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoa
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField control={form.control} name="nombre" rules={{ required: 'El nombre es requerido' }} render={({ field }) => (
+            <FormField control={form.control} name="nombre_completo" rules={{ required: 'El nombre completo es requerido' }} render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre</FormLabel>
+                <FormLabel>Nombre completo</FormLabel>
                 <FormControl>
                   <Input placeholder="Juan Pérez" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="username" rules={{ required: 'El nombre de usuario es requerido' }} render={({ field }) => (
+              <FormItem>
+                <FormLabel>Usuario</FormLabel>
+                <FormControl>
+                  <Input placeholder="axel123" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -83,21 +108,42 @@ export const UsuarioForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoa
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="telefono" rules={{ required: 'El teléfono es requerido' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Teléfono</FormLabel>
-                <FormControl>
-                  <Input placeholder="+54 11 1234-5678" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="password"
+              rules={
+                mode === 'create'
+                  ? { required: 'La contraseña es requerida' }
+                  : {}
+              }
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contraseña</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={mode === 'create' ? 'Ingresa una contraseña' : 'Deja en blanco para no cambiarla'}
+                      type="password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="rol" rules={{ required: 'El rol es requerido' }} render={({ field }) => (
+            <FormField control={form.control} name="role" rules={{ required: 'El rol es requerido' }} render={({ field }) => (
               <FormItem>
                 <FormLabel>Rol</FormLabel>
                 <FormControl>
-                  <Input placeholder="admin/user" {...field} />
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona un rol" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Empleado">Empleado</SelectItem>
+                      <SelectItem value="Administrador">Administrador</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>

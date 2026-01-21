@@ -49,7 +49,7 @@ export const Usuario = () => {
 
   const handleUpdateSubmit = async (data) => {
     if (!selectedUsuario) return;
-    const result = await handleUpdate(selectedUsuario.id, data);
+    const result = await handleUpdate(selectedUsuario.user_id, data);
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedUsuario(null);
@@ -59,7 +59,7 @@ export const Usuario = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedUsuario) return;
-    const result = await handleDelete(selectedUsuario.id);
+    const result = await handleDelete(selectedUsuario.user_id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedUsuario(null);
@@ -129,7 +129,7 @@ export const Usuario = () => {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar a ${selectedUsuario?.nombre}? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de eliminar a ${selectedUsuario?.nombre_completo || selectedUsuario?.username || "este usuario"}? Esta acción no se puede deshacer.`}
       />
     </div>
   );

@@ -29,6 +29,7 @@ export const UsuarioTable = ({ columns, data }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getRowId: (row) => row.user_id || row.id || row.username,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     state: {
@@ -42,9 +43,11 @@ export const UsuarioTable = ({ columns, data }) => {
       <div className="flex items-center justify-between">
         <Input
           placeholder="Filtrar por nombre..."
-          value={table.getColumn('nombre')?.getFilterValue() ?? ''}
+          value={table.getColumn('nombre_completo')?.getFilterValue() ?? ''}
           onChange={(event) =>
-            table.getColumn('nombre')?.setFilterValue(event.target.value)
+            table
+              .getColumn('nombre_completo')
+              ?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

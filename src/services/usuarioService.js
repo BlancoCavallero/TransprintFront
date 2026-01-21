@@ -7,7 +7,7 @@ import {
 import { getHeaders } from "../utils/getHeaders";
 
 export const getUsuario = async () => {
-  return await getGeneric("/usuario", {}, getHeaders());
+  return await getGeneric("/usuarios", {}, getHeaders());
 };
 
 // Si en el futuro el back soporta a /usuario?page=1&limit=10
@@ -17,15 +17,19 @@ export const getUsuario = async () => {
 
 // Registrar usuario
 export const postUsuario = async (data) => {
-  return await postGeneric("/usuario", data, getHeaders());
+  return await postGeneric("/register", data, getHeaders());
 };
 
 // Actualizar usuario
 export const putUsuario = async (id, data) => {
-  return await putGeneric(`/usuario/${id}`, data, getHeaders());
+  // Encode the ID to handle special characters like | (pipe)
+  const encodedId = encodeURIComponent(id);
+  return await putGeneric(`/usuarios/${encodedId}`, data, getHeaders());
 };
 
 // Eliminar usuario
 export const deleteUsuario = async (id) => {
-  return await deleteGeneric(`/usuario/${id}`, getHeaders());
+  // Encode the ID to handle special characters like | (pipe)
+  const encodedId = encodeURIComponent(id);
+  return await deleteGeneric(`/usuarios/${encodedId}`, getHeaders());
 };

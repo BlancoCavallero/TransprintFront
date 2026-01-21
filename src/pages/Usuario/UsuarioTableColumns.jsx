@@ -1,24 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, Mail, Phone } from 'lucide-react';
+import { Eye, Edit, Trash2, Mail, UserCircle } from 'lucide-react';
 import { ArrowUpDown } from 'lucide-react';
 
 export const createUsuarioColumns = (onEdit, onDelete, onView) => [
   {
-    accessorKey: 'id',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          ID
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: 'nombre',
+    accessorKey: 'nombre_completo',
     header: ({ column }) => {
       return (
         <Button
@@ -26,6 +12,20 @@ export const createUsuarioColumns = (onEdit, onDelete, onView) => [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Nombre
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: 'username',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Usuario
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -44,20 +44,18 @@ export const createUsuarioColumns = (onEdit, onDelete, onView) => [
     },
   },
   {
-    accessorKey: 'telefono',
-    header: 'Teléfono',
+    id: 'role',
+    header: 'Rol',
     cell: ({ row }) => {
+      const role = row.original.role || row.original.roles?.[0] || 'Sin rol';
+
       return (
         <div className="flex items-center gap-2">
-          <Phone className="h-4 w-4 text-gray-500" />
-          <span>{row.original.telefono}</span>
+          <UserCircle className="h-4 w-4 text-gray-500" />
+          <span>{role}</span>
         </div>
       );
     },
-  },
-  {
-    accessorKey: 'rol',
-    header: 'Rol',
   },
   {
     id: 'acciones',
