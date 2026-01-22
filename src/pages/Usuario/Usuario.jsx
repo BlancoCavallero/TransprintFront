@@ -30,7 +30,7 @@ export const Usuario = () => {
   const [selectedUsuario, setSelectedUsuario] = useState(null);
 
   const handleEditClick = (item) => {
-    setSelectedUsuario(item);
+     setSelectedUsuario({ ...item }); 
     setIsEditDialogOpen(true);
   };
 
@@ -49,7 +49,7 @@ export const Usuario = () => {
 
   const handleUpdateSubmit = async (data) => {
     if (!selectedUsuario) return;
-    const result = await handleUpdate(selectedUsuario.user_id, data);
+    const result = await handleUpdate(selectedUsuario.user_id, data, selectedUsuario);
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedUsuario(null);

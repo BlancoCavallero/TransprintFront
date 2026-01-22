@@ -58,59 +58,70 @@ export const useUsuario = () => {
   const handleCreate = async (data) => {
     setLoadingCreate(true);
     setError(null);
+
     try {
       console.log("Creating user with data:", data);
-      const response = await postUsuario(data);
-      console.log("Create response:", response);
-      const nuevo = normalizeUser(
-        response?.data ?? response?.usuario ?? response,
-      );
 
-      if (nuevo) setUsuarios((prev) => [...prev, nuevo]);
-      return { success: true, data: nuevo };
+      await postUsuario(data); // no usamos lo que devuelve
+      await fetchUsuarios(); // traemos lista completa real
+
+      return { success: true };
     } catch (err) {
       const errorMsg =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
         err.message ||
         "Error desconocido";
+
       setError(errorMsg);
       console.error("Error al crear usuario:", err);
       console.error("Error response:", err?.response?.data);
+
       return { success: false, error: errorMsg };
     } finally {
       setLoadingCreate(false);
     }
   };
 
-  const handleUpdate = async (id, data) => {
+  const handleUpdate = async (id, data, selectedUsuario) => {
     setLoadingUpdate(true);
     setError(null);
+
     try {
-      const payload = { ...data };
-      console.log("Updating user ID:", id);
-      console.log("Payload before password check:", payload);
-      if (!payload?.password) delete payload.password;
+      const payload = {};
 
-      const response = await putUsuario(id, payload);
-      console.log("Update response:", response);
-      const actualizado = normalizeUser(response?.data ?? response);
+      Object.keys(data).forEach((key) => {
+        const newValue = data[key];
+        const oldValue = selectedUsuario[key];
 
-      if (actualizado) {
-        setUsuarios((prev) =>
-          prev.map((u) => (u.user_id === id ? actualizado : u)),
-        );
+        if (newValue === "" || newValue == null) return;
+        if (newValue === oldValue) return;
+
+        payload[key] = newValue;
+      });
+
+      if (!data.password || data.password.trim() === "") {
+        delete payload.password;
       }
-      return { success: true, data: actualizado };
+
+      console.log("Updating user ID:", id);
+      console.log("Final payload:", payload);
+
+      await putUsuario(id, payload); // no usamos respuesta parcial
+      await fetchUsuarios(); // estado completo desde backend
+
+      return { success: true };
     } catch (err) {
       const errorMsg =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
         err.message ||
         "Error desconocido";
+
       setError(errorMsg);
       console.error("Error al actualizar usuario:", err);
       console.error("Error response:", err?.response?.data);
+
       return { success: false, error: errorMsg };
     } finally {
       setLoadingUpdate(false);
