@@ -5,26 +5,27 @@ import {
   deleteGeneric,
 } from "./genericService";
 
+// Obtener todos los clientes
 export const getCliente = async () => {
-  return await getGeneric("/cliente");
+  return await getGeneric("/clients");
 };
 
-// Si en el futuro el back soporta a /cliente?page=1&limit=10
-// export const getClientes = async (params = {}) => {
-//   return await getGeneric("/cliente", params);
-// };
+// Obtener localidades para el desplegable
+export const getLocalidades = async () => {
+  return await getGeneric("/localidades");
+};
 
 // Registrar cliente
 export const postCliente = async (data) => {
-  return await postGeneric("/cliente", data);
+  return await postGeneric("/clients", data);
 };
 
 // Actualizar cliente
 export const putCliente = async (id, data) => {
-  return await putGeneric(`/cliente/${id}`, data);
+  return await putGeneric(`/clients/${id}`, data);
 };
 
 // Eliminar cliente
 export const deleteCliente = async (id) => {
-  return await deleteGeneric(`/cliente/${id}`);
+  return await deleteGeneric(`/clients/${id}`);
 };
