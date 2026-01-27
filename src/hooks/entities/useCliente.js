@@ -1,21 +1,58 @@
-//USO REAL
-// import {
-//   getCliente,
-//   postCliente,
-//   putCliente,
-//   deleteCliente,
-// } from "../../services/clienteService";
+import { useState, useEffect, useCallback } from "react";
 import {
   getCliente,
   postCliente,
   putCliente,
   deleteCliente,
-} from "../../services/mock/mockApi"; //USO MOCK
-import { useState, useEffect, useCallback } from "react";
+  getLocalidades,
+} from "../../services/clienteService";
+
+/**
+ * Normaliza los datos del cliente desde el backend
+ * El backend devuelve: { success, data: { idCliente, persona: {...}, localidad: {...} } }
+ */
+const normalizeCliente = (cliente) => {
+  if (!cliente) return cliente;
+
+  return {
+    ...cliente,
+    id: cliente.idCliente,
+    nombre: cliente.persona?.nombre || cliente.nombre || "",
+    apellido: cliente.persona?.apellido || cliente.apellido || "",
+    cuit: cliente.persona?.cuit || cliente.cuit || "",
+    telefono: cliente.persona?.telefono || cliente.telefono || "",
+    nombreCompleto:
+      `${cliente.persona?.nombre || cliente.nombre || ""} ${cliente.persona?.apellido || cliente.apellido || ""}`.trim(),
+  };
+};
+
+/**
+ * Extrae la lista de clientes desde diferentes estructuras de respuesta
+ */
+const extractClientes = (response) => {
+  // Caso 1: { success: true, data: [...] }
+  if (response?.success && Array.isArray(response.data)) {
+    return response.data.map(normalizeCliente);
+  }
+
+  // Caso 2: Array directo
+  if (Array.isArray(response)) {
+    return response.map(normalizeCliente);
+  }
+
+  // Caso 3: { data: [...] }
+  if (Array.isArray(response?.data)) {
+    return response.data.map(normalizeCliente);
+  }
+
+  return [];
+};
 
 export const useCliente = () => {
   const [clientes, setClientes] = useState([]);
+  const [localidades, setLocalidades] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingLocalidades, setLoadingLocalidades] = useState(false);
   const [error, setError] = useState(null);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -26,55 +63,90 @@ export const useCliente = () => {
     setError(null);
     try {
       const response = await getCliente();
-      // Soporta tanto arrays como objetos { data: [...] }
-      setClientes(Array.isArray(response) ? response : response.data || []);
+      setClientes(extractClientes(response));
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
       console.error("Error al cargar clientes:", err);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  const fetchLocalidades = useCallback(async () => {
+    setLoadingLocalidades(true);
+    try {
+      const response = await getLocalidades();
+      // Extraer localidades: { success: true, data: [...] }
+      const localidadesData = response?.data || response || [];
+      setLocalidades(localidadesData);
+    } catch (err) {
+      console.error("Error al cargar localidades:", err);
+      // No seteamos error global para localidades, solo log
+    } finally {
+      setLoadingLocalidades(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchClientes();
-  }, [fetchClientes]);
+    fetchLocalidades();
+  }, [fetchClientes, fetchLocalidades]);
 
-  const handleCreate = async (clienteData) => {
+  const handleCreate = async (data) => {
     setLoadingCreate(true);
     setError(null);
     try {
-      const response = await postCliente(clienteData);
-      const nuevoCliente = response.data;
-      if (nuevoCliente) setClientes((prev) => [...prev, nuevoCliente]);
-      return { success: true, data: nuevoCliente };
+      console.log("Creating cliente with data:", data);
+
+      await postCliente(data);
+      await fetchClientes(); // Recarga la lista completa
+
+      return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+
+      setError(errorMsg);
       console.error("Error al crear cliente:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingCreate(false);
     }
   };
 
-  const handleUpdate = async (id, clienteData) => {
+  const handleUpdate = async (id, data) => {
     setLoadingUpdate(true);
     setError(null);
     try {
-      const response = await putCliente(id, clienteData);
-      const clienteActualizado = response.data;
-      if (clienteActualizado) {
-        setClientes((prev) =>
-          prev.map((cliente) =>
-            cliente.id === id ? clienteActualizado : cliente
-          )
-        );
-      }
-      return { success: true, data: clienteActualizado };
+      console.log("Updating cliente ID:", id);
+      console.log("Update data:", data);
+
+      await putCliente(id, data);
+      await fetchClientes(); // Recarga la lista
+
+      return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+
+      setError(errorMsg);
       console.error("Error al actualizar cliente:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingUpdate(false);
     }
@@ -84,13 +156,25 @@ export const useCliente = () => {
     setLoadingDelete(true);
     setError(null);
     try {
+      console.log("Deleting cliente ID:", id);
       await deleteCliente(id);
-      setClientes((prev) => prev.filter((cliente) => cliente.id !== id));
+
+      // Actualización optimista
+      setClientes((prev) =>
+        prev.filter((c) => c.id !== id && c.idCliente !== id),
+      );
+
       return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
       console.error("Error al eliminar cliente:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingDelete(false);
     }
@@ -98,7 +182,9 @@ export const useCliente = () => {
 
   return {
     clientes,
+    localidades,
     loading,
+    loadingLocalidades,
     error,
     loadingCreate,
     loadingUpdate,
@@ -109,142 +195,3 @@ export const useCliente = () => {
     refetch: fetchClientes,
   };
 };
-
-// import { useParametrosGenerales } from "../useParametrosGenerales";
-
-// export const useCliente = () => {
-//   const [cliente, setCliente] = useState([]);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [error, setError] = useState(null);
-
-//   // A chequear que esto se utilice
-//   //   const { pagina, itemsPorPagina, empresaId } = useParametrosGenerales();
-
-//   useEffect(() => {
-//     fetchData();
-//   }, [pagina]);
-
-//   const fetchData = async () => {
-//     try {
-//       setIsLoading(true);
-//       setError(null);
-
-//       const response = await getCliente(1, 100, 1);
-//       setCliente(response.payload.rows);
-//     } catch (err) {
-//       setError(err.message);
-//       console.error("Error al cargar cliente:", err);
-//       Swal.fire({
-//         title: "Error",
-//         text: err.message || "No se pudieron cargar los clientes",
-//         icon: "error",
-//         confirmButtonText: "Ok",
-//         confirmButtonColor: "#592673",
-//       });
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const handleCreate = async (nuevoCliente) => {
-//     try {
-//       setIsLoading(true);
-//       await postCliente({ ...nuevoCliente, empresaId });
-//       await fetchData();
-//       Swal.fire({
-//         title: "Éxito",
-//         text: "Cliente creado correctamente",
-//         icon: "success",
-//         confirmButtonText: "Ok",
-//         confirmButtonColor: "#592673",
-//       });
-//     } catch (err) {
-//       console.error(err);
-//       Swal.fire({
-//         title: "Error",
-//         text: err.message || "No se pudo crear el cliente",
-//         icon: "error",
-//         confirmButtonText: "Ok",
-//         confirmButtonColor: "#592673",
-//       });
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const handleUpdate = async (id, datosActualizados) => {
-//     try {
-//       setIsLoading(true);
-//       await putCliente(id, datosActualizados);
-//       await fetchData();
-//       Swal.fire({
-//         title: "Éxito",
-//         text: "Cliente actualizado correctamente",
-//         icon: "success",
-//         confirmButtonText: "Ok",
-//         confirmButtonColor: "#592673",
-//       });
-//     } catch (err) {
-//       console.error(err);
-//       Swal.fire({
-//         title: "Error",
-//         text: err.message || "No se pudo actualizar la cliente",
-//         icon: "error",
-//         confirmButtonText: "Ok",
-//         confirmButtonColor: "#592673",
-//       });
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const handleDelete = async (id) => {
-//     const confirm = await Swal.fire({
-//       title: "¿Estás seguro?",
-//       text: "Esta acción no se puede deshacer",
-//       icon: "warning",
-//       showCancelButton: true,
-//       confirmButtonText: "Sí, eliminar",
-//       cancelButtonText: "Cancelar",
-//       confirmButtonColor: "#592673",
-//       cancelButtonColor: "#ff0000",
-//       reverseButtons: true,
-//     });
-
-//     if (confirm.isConfirmed) {
-//       try {
-//         setIsLoading(true);
-//         await deleteCliente(id);
-//         await fetchData();
-//         Swal.fire({
-//           title: "Eliminado",
-//           text: "Cliente eliminado correctamente",
-//           icon: "success",
-//           confirmButtonText: "Ok",
-//           confirmButtonColor: "#592673",
-//         });
-//       } catch (err) {
-//         console.error(err);
-//         Swal.fire({
-//           title: "Error",
-//           text: err.message || "No se pudo eliminar la cliente",
-//           icon: "error",
-//           confirmButtonText: "Ok",
-//           confirmButtonColor: "#592673",
-//         });
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     }
-//   };
-
-//   return {
-//     cliente,
-//     isLoading,
-//     error,
-//     handleCreate,
-//     handleUpdate,
-//     handleDelete,
-//     refetch: fetchData,
-//   };
-// };

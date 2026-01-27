@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useCliente } from '../../hooks/entities/useCliente';
 import { ClienteTable } from './ClienteTable';
 import { ClienteForm } from './ClienteForm';
+import { ClienteDetailDialog } from './ClienteDetailDialog';
 import { createClienteColumns } from './ClienteTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,9 @@ import { useAuth } from '../../hooks/useAuth';
 export const Cliente = () => {
   const {
     clientes,
+    localidades,
     loading,
+    loadingLocalidades,
     error,
     loadingCreate,
     loadingUpdate,
@@ -28,8 +31,14 @@ export const Cliente = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedCliente, setSelectedCliente] = useState(null);
   const {user } =useAuth();
+
+  const handleViewClick = (cliente) => {
+    setSelectedCliente(cliente);
+    setIsDetailDialogOpen(true);
+  };
 
   const handleEditClick = (cliente) => {
     setSelectedCliente(cliente);
@@ -52,7 +61,7 @@ export const Cliente = () => {
 
   const handleUpdateSubmit = async (data) => {
     if (!selectedCliente) return;
-    const result = await handleUpdate(selectedCliente.id, data);
+    const result = await handleUpdate(selectedCliente.idCliente || selectedCliente.id, data);
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedCliente(null);
@@ -62,14 +71,14 @@ export const Cliente = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedCliente) return;
-    const result = await handleDelete(selectedCliente.id);
+    const result = await handleDelete(selectedCliente.idCliente || selectedCliente.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedCliente(null);
     }
   };
 
-  const columns = createClienteColumns(handleEditClick, handleDeleteClick);
+  const columns = createClienteColumns(handleEditClick, handleDeleteClick, handleViewClick);
 
   if (loading) {
     return (
@@ -110,10 +119,18 @@ export const Cliente = () => {
 
       <ClienteTable columns={columns} data={clientes} />
 
+      <ClienteDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        cliente={selectedCliente}
+      />
+
       <ClienteForm
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         onSubmit={handleCreateSubmit}
+        localidades={localidades}
+        loadingLocalidades={loadingLocalidades}
         isLoading={loadingCreate}
         mode="create"
       />
@@ -123,6 +140,8 @@ export const Cliente = () => {
         onOpenChange={setIsEditDialogOpen}
         onSubmit={handleUpdateSubmit}
         defaultValues={selectedCliente}
+        localidades={localidades}
+        loadingLocalidades={loadingLocalidades}
         isLoading={loadingUpdate}
         mode="edit"
       />
@@ -132,7 +151,7 @@ export const Cliente = () => {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar a ${selectedCliente?.nombre}? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de eliminar a ${selectedCliente?.nombreCompleto || selectedCliente?.razonSocial}? Esta acción no se puede deshacer.`}
       />
     </div>
   );

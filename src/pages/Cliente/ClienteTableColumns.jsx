@@ -4,21 +4,7 @@ import { ArrowUpDown } from 'lucide-react';
 
 export const createClienteColumns = (onEdit, onDelete, onView) => [
   {
-    accessorKey: 'id',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          ID
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: 'nombre',
+    accessorKey: 'nombreCompleto',
     header: ({ column }) => {
       return (
         <Button
@@ -30,15 +16,20 @@ export const createClienteColumns = (onEdit, onDelete, onView) => [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const nombre = row.original.persona?.nombre || row.original.nombre || '';
+      const apellido = row.original.persona?.apellido || row.original.apellido || '';
+      return `${nombre} ${apellido}`.trim() || 'Sin nombre';
+    },
   },
   {
-    accessorKey: 'email',
+    accessorKey: 'correo',
     header: 'Email',
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
           <Mail className="h-4 w-4 text-gray-500" />
-          <span>{row.original.email}</span>
+          <span>{row.original.correo}</span>
         </div>
       );
     },
@@ -47,32 +38,42 @@ export const createClienteColumns = (onEdit, onDelete, onView) => [
     accessorKey: 'telefono',
     header: 'Teléfono',
     cell: ({ row }) => {
+      const telefono = row.original.persona?.telefono || row.original.telefono || 'Sin teléfono';
       return (
         <div className="flex items-center gap-2">
           <Phone className="h-4 w-4 text-gray-500" />
-          <span>{row.original.telefono}</span>
+          <span>{telefono}</span>
         </div>
       );
     },
   },
   {
-    accessorKey: 'empresa',
-    header: 'Empresa',
+    accessorKey: 'tipo',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Tipo
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
+      const tipo = row.original.tipo;
       return (
         <div className="flex items-center gap-2">
           <Building className="h-4 w-4 text-gray-500" />
-          <span>{row.original.empresa}</span>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            tipo === 'Empresa' 
+              ? 'bg-blue-100 text-blue-700' 
+              : 'bg-green-100 text-green-700'
+          }`}>
+            {tipo}
+          </span>
         </div>
       );
-    },
-  },
-  {
-    accessorKey: 'fechaCreacion',
-    header: 'Fecha',
-    cell: ({ row }) => {
-      const fecha = row.original.fechaCreacion;
-      return new Date(fecha).toLocaleDateString('es-ES');
     },
   },
   {

@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,70 +18,75 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
-
-// Función auxiliar para formatear fecha a formato YYYY-MM-DD
-const formatDateForInput = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toISOString().split('T')[0];
-};
-
-// Función auxiliar para convertir fecha de input a ISO string
-const formatDateToISO = (dateString) => {
-  if (!dateString) return new Date().toISOString();
-  const date = new Date(dateString + 'T00:00:00');
-  return date.toISOString();
-};
+import { getClienteSchema } from './clienteSchema';
 
 export const ClienteForm = ({
   open,
   onOpenChange,
   onSubmit,
   defaultValues,
+  localidades = [],
+  loadingLocalidades = false,
   isLoading = false,
-  mode = 'create', // 'create' o 'edit'
+  mode = 'create',
 }) => {
+  const schema = getClienteSchema(mode);
+
   const form = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
+      correo: '',
+      razonSocial: '',
+      tipo: 'Particular',
       nombre: '',
-      email: '',
+      apellido: '',
+      cuit: '',
       telefono: '',
-      empresa: '',
-      fechaCreacion: formatDateForInput(new Date().toISOString()),
+      idLocalidad: undefined,
+      observaciones: '',
     },
   });
 
-  // Actualizar formulario cuando cambian los defaultValues (al editar)
   useEffect(() => {
     if (open && defaultValues && mode === 'edit') {
       form.reset({
-        nombre: defaultValues.nombre || '',
-        email: defaultValues.email || '',
-        telefono: defaultValues.telefono || '',
-        empresa: defaultValues.empresa || '',
-        fechaCreacion: formatDateForInput(defaultValues.fechaCreacion) || formatDateForInput(new Date().toISOString()),
+        correo: defaultValues.correo || '',
+        razonSocial: defaultValues.razonSocial || '',
+        tipo: defaultValues.tipo || 'Particular',
+        nombre: defaultValues.persona?.nombre || defaultValues.nombre || '',
+        apellido: defaultValues.persona?.apellido || defaultValues.apellido || '',
+        cuit: String(defaultValues.persona?.cuit || defaultValues.cuit || ''),
+        telefono: String(defaultValues.persona?.telefono || defaultValues.telefono || ''),
+        idLocalidad: defaultValues.idLocalidad || undefined,
+        observaciones: defaultValues.observaciones || '',
       });
     } else if (open && mode === 'create') {
       form.reset({
+        correo: '',
+        razonSocial: '',
+        tipo: 'Particular',
         nombre: '',
-        email: '',
+        apellido: '',
+        cuit: '',
         telefono: '',
-        empresa: '',
-        fechaCreacion: formatDateForInput(new Date().toISOString()),
+        idLocalidad: undefined,
+        observaciones: '',
       });
     }
   }, [open, defaultValues, mode, form]);
 
   const handleSubmit = async (data) => {
-    // Convertir la fecha a ISO string
-    const dataWithFormattedDate = {
-      ...data,
-      fechaCreacion: formatDateToISO(data.fechaCreacion),
-    };
-
-    const result = await onSubmit(dataWithFormattedDate);
+    const result = await onSubmit(data);
     if (result?.success) {
       form.reset();
       onOpenChange(false);
@@ -89,7 +95,7 @@ export const ClienteForm = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {mode === 'create' ? 'Crear Nuevo Cliente' : 'Editar Cliente'}
@@ -103,42 +109,44 @@ export const ClienteForm = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="nombre"
-              rules={{ 
-                required: 'El nombre es requerido',
-                minLength: {
-                  value: 2,
-                  message: 'El nombre debe tener al menos 2 caracteres'
-                }
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Juan Pérez" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="nombre"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Juan" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="apellido"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Apellido</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Pérez" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
-              name="email"
-              rules={{
-                required: 'El email es requerido',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Email inválido',
-                },
-              }}
+              name="correo"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="juan@ejemplo.com" type="email" {...field} />
+                    <Input placeholder="contacto@empresa.com" type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -147,19 +155,12 @@ export const ClienteForm = ({
 
             <FormField
               control={form.control}
-              name="telefono"
-              rules={{ 
-                required: 'El teléfono es requerido',
-                minLength: {
-                  value: 8,
-                  message: 'El teléfono debe tener al menos 8 caracteres'
-                }
-              }}
+              name="razonSocial"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Teléfono</FormLabel>
+                  <FormLabel>Razón Social</FormLabel>
                   <FormControl>
-                    <Input placeholder="+54 11 1234-5678" {...field} />
+                    <Input placeholder="Transporte ABC S.A." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -168,15 +169,82 @@ export const ClienteForm = ({
 
             <FormField
               control={form.control}
-              name="empresa"
-              rules={{
-                required: 'La empresa es requerida'
-              }}
+              name="tipo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Empresa</FormLabel>
+                  <FormLabel>Tipo de Cliente</FormLabel>
                   <FormControl>
-                    <Input placeholder="Empresa SRL" {...field} />
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecciona un tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Particular">Particular</SelectItem>
+                        <SelectItem value="Empresa">Empresa</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="cuit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CUIT</FormLabel>
+                    <FormControl>
+                      <Input placeholder="20123456789" maxLength={11} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="telefono"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Teléfono</FormLabel>
+                    <FormControl>
+                      <Input placeholder="1187654321" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="idLocalidad"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Localidad</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                      value={field.value ? String(field.value) : undefined}
+                      disabled={loadingLocalidades}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={loadingLocalidades ? "Cargando localidades..." : "Selecciona una localidad"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {localidades.map((loc) => (
+                          <SelectItem
+                            key={loc.idLocalidad}
+                            value={String(loc.idLocalidad)}
+                          >
+                            {loc.localidad} - {loc.provincia} {loc.codPostal ? `(CP: ${loc.codPostal})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,16 +253,15 @@ export const ClienteForm = ({
 
             <FormField
               control={form.control}
-              name="fechaCreacion"
-              rules={{
-                required: 'La fecha de creación es requerida'
-              }}
+              name="observaciones"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Fecha de Creación</FormLabel>
+                  <FormLabel>Observaciones (Opcional)</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="date" 
+                    <Textarea
+                      placeholder="Notas adicionales sobre el cliente..."
+                      className="resize-none"
+                      rows={3}
                       {...field}
                     />
                   </FormControl>
