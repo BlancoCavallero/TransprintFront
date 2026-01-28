@@ -1,4 +1,5 @@
-import { useForm } from 'react-hook-form';
+import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,35 +18,67 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
+import { getVehiculoSchema } from './vehiculoSchema';
 
-export const VehiculoForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoading = false, mode = 'create' }) => {
+export const VehiculoForm = ({
+  open,
+  onOpenChange,
+  onSubmit,
+  defaultValues,
+  isLoading = false,
+  mode = 'create',
+}) => {
+  const schema = getVehiculoSchema(mode);
+
   const form = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
-      placa: '',
+      patente: '',
       marca: '',
       modelo: '',
-      año: '',
+      anio: '',
+      estado: 'Activo',
       tipo: '',
-      kilometraje: '',
-      estado: '',
     },
   });
 
   useEffect(() => {
     if (open && defaultValues && mode === 'edit') {
+      // Normalizar el tipo (puede venir como "CAMION" o "Camion")
+      const normalizeTipo = (tipo) => {
+        if (!tipo) return '';
+        const tipoUpper = tipo.toUpperCase();
+        if (tipoUpper === 'CAMION') return 'Camion';
+        if (tipoUpper === 'ACOPLADO') return 'Acoplado';
+        return tipo;
+      };
+
       form.reset({
-        placa: defaultValues.placa || '',
+        patente: defaultValues.patente || '',
         marca: defaultValues.marca || '',
         modelo: defaultValues.modelo || '',
-        año: defaultValues.año || '',
-        tipo: defaultValues.tipo || '',
-        kilometraje: defaultValues.kilometraje || '',
-        estado: defaultValues.estado || '',
+        anio: defaultValues.anio?.toString() || '',
+        estado: defaultValues.estado || 'Activo',
+        tipo: normalizeTipo(defaultValues.tipo),
       });
     } else if (open && mode === 'create') {
-      form.reset({ placa: '', marca: '', modelo: '', año: '', tipo: '', kilometraje: '', estado: '' });
+      form.reset({
+        patente: '',
+        marca: '',
+        modelo: '',
+        anio: '',
+        estado: 'Activo',
+        tipo: '',
+      });
     }
   }, [open, defaultValues, mode, form]);
 
@@ -69,79 +102,121 @@ export const VehiculoForm = ({ open, onOpenChange, onSubmit, defaultValues, isLo
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField control={form.control} name="placa" rules={{ required: 'La placa es requerida' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Placa</FormLabel>
-                <FormControl>
-                  <Input placeholder="ABC-123" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="patente"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Patente</FormLabel>
+                  <FormControl>
+                    <Input placeholder="ABC123" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="marca" rules={{ required: 'La marca es requerida' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Marca</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ford" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="marca"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marca</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ford" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="modelo" rules={{ required: 'El modelo es requerido' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Modelo</FormLabel>
-                <FormControl>
-                  <Input placeholder="Transit" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="modelo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Modelo</FormLabel>
+                  <FormControl>
+                    <Input placeholder="F-150" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="año" rules={{ required: 'El año es requerido' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Año</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="2023" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="anio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Año</FormLabel>
+                  <FormControl>
+                    <Input placeholder="2020" maxLength={4} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="tipo" rules={{ required: 'El tipo es requerido' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tipo</FormLabel>
-                <FormControl>
-                  <Input placeholder="Camioneta" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="tipo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Vehículo</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Seleccione un tipo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Camion">Camión</SelectItem>
+                      <SelectItem value="Acoplado">Acoplado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <FormField control={form.control} name="kilometraje" rules={{ required: 'El kilometraje es requerido' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Kilometraje</FormLabel>
-                <FormControl>
-                  <Input placeholder="45000" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="estado" rules={{ required: 'El estado es requerido' }} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Estado</FormLabel>
-                <FormControl>
-                  <Input placeholder="Disponible" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            {/* TODO: Eliminar este campo cuando el backend implemente el estado automático */}
+            <FormField
+              control={form.control}
+              name="estado"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Estado</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Seleccione un estado" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Activo">Activo</SelectItem>
+                      <SelectItem value="Inactivo">Inactivo</SelectItem>
+                      <SelectItem value="En mantenimiento">En mantenimiento</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>Cancelar</Button>
-              <Button type="submit" disabled={isLoading}>{isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {mode === 'create' ? 'Crear' : 'Guardar'}</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isLoading}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {mode === 'create' ? 'Crear' : 'Guardar'}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

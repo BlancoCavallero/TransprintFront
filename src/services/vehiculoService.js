@@ -6,25 +6,20 @@ import {
 } from "./genericService";
 
 export const getVehiculo = async () => {
-  return await getGeneric("/vehiculo");
+  return await getGeneric("/vehiculos");
 };
-
-// Si en el futuro el back soporta a /vehiculo?page=1&limit=10
-// export const getvehiculos = async (params = {}) => {
-//   return await getGeneric("/vehiculo", params);
-// };
 
 // Registrar vehiculo
 export const postVehiculo = async (data) => {
-  return await postGeneric("/vehiculo", data);
+  return await postGeneric("/vehiculos", data);
 };
 
 // Actualizar vehiculo
 export const putVehiculo = async (id, data) => {
-  return await putGeneric(`/vehiculo/${id}`, data);
+  return await putGeneric(`/vehiculos/${id}`, data);
 };
 
 // Eliminar vehiculo
 export const deleteVehiculo = async (id) => {
-  return await deleteGeneric(`/vehiculo/${id}`);
+  return await deleteGeneric(`/vehiculos/${id}`);
 };

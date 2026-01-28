@@ -29,6 +29,7 @@ export const VehiculoTable = ({ columns, data }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getRowId: (row) => row.idVehiculo || row.id,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     state: {
@@ -41,10 +42,10 @@ export const VehiculoTable = ({ columns, data }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Input
-          placeholder="Filtrar por placa..."
-          value={table.getColumn('placa')?.getFilterValue() ?? ''}
+          placeholder="Filtrar por patente..."
+          value={table.getColumn('patente')?.getFilterValue() ?? ''}
           onChange={(event) =>
-            table.getColumn('placa')?.setFilterValue(event.target.value)
+            table.getColumn('patente')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

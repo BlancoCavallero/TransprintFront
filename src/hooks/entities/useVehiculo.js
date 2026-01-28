@@ -6,6 +6,35 @@ import {
   deleteVehiculo,
 } from "../../services/vehiculoService";
 
+// Normaliza un vehículo para asegurar estructura consistente
+const normalizeVehiculo = (vehiculo) => {
+  if (!vehiculo) return vehiculo;
+
+  return {
+    ...vehiculo,
+    idVehiculo: vehiculo.idVehiculo ?? vehiculo.id,
+    patente: vehiculo.patente ?? "",
+    marca: vehiculo.marca ?? "",
+    modelo: vehiculo.modelo ?? "",
+    anio: vehiculo.anio ?? null,
+    estado: vehiculo.estado ?? "",
+    tipo: vehiculo.tipo ?? "",
+  };
+};
+
+// Extrae la lista de vehículos de diferentes formatos de respuesta
+const extractVehiculos = (response) => {
+  const list = Array.isArray(response)
+    ? response
+    : Array.isArray(response?.data)
+      ? response.data
+      : Array.isArray(response?.data?.data)
+        ? response.data.data
+        : [];
+
+  return list.map(normalizeVehiculo);
+};
+
 export const useVehiculo = () => {
   const [vehiculos, setVehiculos] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +48,7 @@ export const useVehiculo = () => {
     setError(null);
     try {
       const response = await getVehiculo();
-      setVehiculos(Array.isArray(response) ? response : response.data || []);
+      setVehiculos(extractVehiculos(response));
     } catch (err) {
       setError(err.message || "Error desconocido");
       console.error("Error al cargar vehiculos:", err);
@@ -35,36 +64,66 @@ export const useVehiculo = () => {
   const handleCreate = async (data) => {
     setLoadingCreate(true);
     setError(null);
+
     try {
-      const response = await postVehiculo(data);
-      const nuevo = response.data;
-      if (nuevo) setVehiculos((prev) => [...prev, nuevo]);
-      return { success: true, data: nuevo };
+      console.log("Creating vehiculo with data:", data);
+
+      await postVehiculo(data);
+      await fetchVehiculos(); // Recarga la lista completa
+
+      return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+
+      setError(errorMsg);
       console.error("Error al crear vehiculo:", err);
-      return { success: false, error: err.message };
+
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingCreate(false);
     }
   };
 
-  const handleUpdate = async (id, data) => {
+  const handleUpdate = async (id, data, selectedVehiculo) => {
     setLoadingUpdate(true);
     setError(null);
+
     try {
-      const response = await putVehiculo(id, data);
-      const actualizado = response.data;
-      if (actualizado) {
-        setVehiculos((prev) =>
-          prev.map((v) => (v.id === id ? actualizado : v))
-        );
-      }
-      return { success: true, data: actualizado };
+      const payload = {};
+
+      // Solo envía campos modificados
+      Object.keys(data).forEach((key) => {
+        const newValue = data[key];
+        const oldValue = selectedVehiculo?.[key];
+
+        if (newValue === "" || newValue == null) return;
+        if (newValue === oldValue) return;
+
+        payload[key] = newValue;
+      });
+
+      console.log("Updating vehiculo ID:", id);
+      console.log("Final payload:", payload);
+
+      await putVehiculo(id, payload);
+      await fetchVehiculos(); // Recarga lista
+
+      return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+
+      setError(errorMsg);
       console.error("Error al actualizar vehiculo:", err);
-      return { success: false, error: err.message };
+
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingUpdate(false);
     }
@@ -74,13 +133,22 @@ export const useVehiculo = () => {
     setLoadingDelete(true);
     setError(null);
     try {
+      console.log("Deleting vehiculo ID:", id);
       await deleteVehiculo(id);
-      setVehiculos((prev) => prev.filter((v) => v.id !== id));
+
+      // Actualización optimista del estado local
+      setVehiculos((prev) => prev.filter((v) => v.idVehiculo !== id));
+
       return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
       console.error("Error al eliminar vehiculo:", err);
-      return { success: false, error: err.message };
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingDelete(false);
     }

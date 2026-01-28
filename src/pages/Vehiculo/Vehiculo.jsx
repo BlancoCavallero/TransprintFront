@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useVehiculo } from '../../hooks/entities/useVehiculo';
 import { VehiculoTable } from './VehiculoTable';
 import { VehiculoForm } from './VehiculoForm';
+import { VehiculoDetailDialog } from './VehiculoDetailDialog';
 import { createVehiculoColumns } from './VehiculoTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
@@ -27,15 +28,21 @@ export const Vehiculo = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedVehiculo, setSelectedVehiculo] = useState(null);
 
+  const handleViewClick = (item) => {
+    setSelectedVehiculo({ ...item });
+    setIsDetailDialogOpen(true);
+  };
+
   const handleEditClick = (item) => {
-    setSelectedVehiculo(item);
+    setSelectedVehiculo({ ...item });
     setIsEditDialogOpen(true);
   };
 
   const handleDeleteClick = (item) => {
-    setSelectedVehiculo(item);
+    setSelectedVehiculo({ ...item });
     setIsDeleteDialogOpen(true);
   };
 
@@ -49,7 +56,11 @@ export const Vehiculo = () => {
 
   const handleUpdateSubmit = async (data) => {
     if (!selectedVehiculo) return;
-    const result = await handleUpdate(selectedVehiculo.id, data);
+    const result = await handleUpdate(
+      selectedVehiculo.idVehiculo || selectedVehiculo.id,
+      data,
+      selectedVehiculo
+    );
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedVehiculo(null);
@@ -59,14 +70,18 @@ export const Vehiculo = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedVehiculo) return;
-    const result = await handleDelete(selectedVehiculo.id);
+    const result = await handleDelete(selectedVehiculo.idVehiculo || selectedVehiculo.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedVehiculo(null);
     }
   };
 
-  const columns = createVehiculoColumns(handleEditClick, handleDeleteClick);
+  const columns = createVehiculoColumns(
+    handleEditClick,
+    handleDeleteClick,
+    handleViewClick
+  );
 
   if (loading) {
     return (
@@ -124,12 +139,18 @@ export const Vehiculo = () => {
         mode="edit"
       />
 
+      <VehiculoDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        vehiculo={selectedVehiculo}
+      />
+
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar el vehículo ${selectedVehiculo?.placa}? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de eliminar el vehículo ${selectedVehiculo?.patente}? Esta acción no se puede deshacer.`}
       />
     </div>
   );
