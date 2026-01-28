@@ -5,26 +5,22 @@ import {
   deleteGeneric,
 } from "./genericService";
 
+// Obtener todos los choferes
 export const getChofer = async () => {
-  return await getGeneric("/chofer");
+  return await getGeneric("/drivers");
 };
 
-// Si en el futuro el back soporta a /cliente?page=1&limit=10
-// export const getChofer = async (params = {}) => {
-//   return await getGeneric("/cliente", params);
-// };
-
-// Registrar cliente
+// Registrar chofer
 export const postChofer = async (data) => {
-  return await postGeneric("/chofer", data);
+  return await postGeneric("/drivers", data);
 };
 
 // Actualizar chofer
 export const putChofer = async (id, data) => {
-  return await putGeneric(`/chofer/${id}`, data);
+  return await putGeneric(`/drivers/${id}`, data);
 };
 
 // Eliminar chofer
 export const deleteChofer = async (id) => {
-  return await deleteGeneric(`/chofer/${id}`);
+  return await deleteGeneric(`/drivers/${id}`);
 };

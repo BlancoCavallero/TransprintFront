@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,20 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
-
-// Función auxiliar para formatear fecha a formato YYYY-MM-DD
-const formatDateForInput = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toISOString().split('T')[0];
-};
-
-// Función auxiliar para convertir fecha de input a ISO string
-const formatDateToISO = (dateString) => {
-  if (!dateString) return new Date().toISOString();
-  const date = new Date(dateString + 'T00:00:00');
-  return date.toISOString();
-};
+import { getChoferSchema } from './choferSchema';
 
 export const ChoferForm = ({
   open,
@@ -40,47 +28,43 @@ export const ChoferForm = ({
   onSubmit,
   defaultValues,
   isLoading = false,
-  mode = 'create', // 'create' o 'edit'
+  mode = 'create',
 }) => {
+  const schema = getChoferSchema(mode);
+
   const form = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
+      dni: undefined,
       nombre: '',
-      email: '',
+      apellido: '',
+      cuit: '',
       telefono: '',
-      empresa: '',
-      fechaCreacion: formatDateForInput(new Date().toISOString()),
     },
   });
 
-  // Actualizar formulario cuando cambian los defaultValues (al editar)
   useEffect(() => {
     if (open && defaultValues && mode === 'edit') {
       form.reset({
-        nombre: defaultValues.nombre || '',
-        email: defaultValues.email || '',
-        telefono: defaultValues.telefono || '',
-        empresa: defaultValues.empresa || '',
-        fechaCreacion: formatDateForInput(defaultValues.fechaCreacion) || formatDateForInput(new Date().toISOString()),
+        dni: defaultValues.dni || undefined,
+        nombre: defaultValues.persona?.nombre || defaultValues.nombre || '',
+        apellido: defaultValues.persona?.apellido || defaultValues.apellido || '',
+        cuit: String(defaultValues.persona?.cuit || defaultValues.cuit || ''),
+        telefono: String(defaultValues.persona?.telefono || defaultValues.telefono || ''),
       });
     } else if (open && mode === 'create') {
       form.reset({
+        dni: undefined,
         nombre: '',
-        email: '',
+        apellido: '',
+        cuit: '',
         telefono: '',
-        empresa: '',
-        fechaCreacion: formatDateForInput(new Date().toISOString()),
       });
     }
   }, [open, defaultValues, mode, form]);
 
   const handleSubmit = async (data) => {
-    // Convertir la fecha a ISO string
-    const dataWithFormattedDate = {
-      ...data,
-      fechaCreacion: formatDateToISO(data.fechaCreacion),
-    };
-
-    const result = await onSubmit(dataWithFormattedDate);
+    const result = await onSubmit(data);
     if (result?.success) {
       form.reset();
       onOpenChange(false);
@@ -92,12 +76,12 @@ export const ChoferForm = ({
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'create' ? 'Crear Nuevo Cliente' : 'Editar Cliente'}
+            {mode === 'create' ? 'Crear Nuevo Chofer' : 'Editar Chofer'}
           </DialogTitle>
           <DialogDescription>
             {mode === 'create'
-              ? 'Completa los datos para crear un nuevo cliente.'
-              : 'Modifica los datos del cliente.'}
+              ? 'Completa los datos para crear un nuevo chofer.'
+              : 'Modifica los datos del chofer.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -105,40 +89,61 @@ export const ChoferForm = ({
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="nombre"
-              rules={{ 
-                required: 'El nombre es requerido',
-                minLength: {
-                  value: 2,
-                  message: 'El nombre debe tener al menos 2 caracteres'
-                }
-              }}
+              name="dni"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre</FormLabel>
+                  <FormLabel>DNI</FormLabel>
                   <FormControl>
-                    <Input placeholder="Juan Pérez" {...field} />
+                    <Input 
+                      placeholder="40880194" 
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value, 10) : undefined)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="nombre"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Axel" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="apellido"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Apellido</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Monzón" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="email"
-              rules={{
-                required: 'El email es requerido',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Email inválido',
-                },
-              }}
+              name="cuit"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>CUIT</FormLabel>
                   <FormControl>
-                    <Input placeholder="juan@ejemplo.com" type="email" {...field} />
+                    <Input placeholder="20408801940" maxLength={11} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -148,55 +153,11 @@ export const ChoferForm = ({
             <FormField
               control={form.control}
               name="telefono"
-              rules={{ 
-                required: 'El teléfono es requerido',
-                minLength: {
-                  value: 8,
-                  message: 'El teléfono debe tener al menos 8 caracteres'
-                }
-              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Teléfono</FormLabel>
                   <FormControl>
-                    <Input placeholder="+54 11 1234-5678" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="empresa"
-              rules={{
-                required: 'La empresa es requerida'
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Empresa</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Empresa SRL" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="fechaCreacion"
-              rules={{
-                required: 'La fecha de creación es requerida'
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Fecha de Creación</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="date" 
-                      {...field}
-                    />
+                    <Input placeholder="1123456789" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

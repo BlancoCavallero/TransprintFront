@@ -1,73 +1,134 @@
+import { useState, useEffect, useCallback } from "react";
 import {
   getChofer,
   postChofer,
   putChofer,
   deleteChofer,
 } from "../../services/choferService";
-import { useState, useEffect, useCallback } from "react";
+
+/**
+ * Normaliza los datos del chofer desde el backend
+ * El backend devuelve: { success, data: { idChofer, persona: {...} } }
+ */
+const normalizeChofer = (chofer) => {
+  if (!chofer) return chofer;
+
+  return {
+    ...chofer,
+    id: chofer.idChofer,
+    nombre: chofer.persona?.nombre || chofer.nombre || "",
+    apellido: chofer.persona?.apellido || chofer.apellido || "",
+    cuit: chofer.persona?.cuit || chofer.cuit || "",
+    telefono: chofer.persona?.telefono || chofer.telefono || "",
+    dni: chofer.dni || "",
+    nombreCompleto:
+      `${chofer.persona?.nombre || chofer.nombre || ""} ${chofer.persona?.apellido || chofer.apellido || ""}`.trim(),
+  };
+};
+
+/**
+ * Extrae la lista de choferes desde diferentes estructuras de respuesta
+ */
+const extractChoferes = (response) => {
+  // Caso 1: { success: true, data: [...] }
+  if (response?.success && Array.isArray(response.data)) {
+    return response.data.map(normalizeChofer);
+  }
+
+  // Caso 2: Array directo
+  if (Array.isArray(response)) {
+    return response.map(normalizeChofer);
+  }
+
+  // Caso 3: { data: [...] }
+  if (Array.isArray(response?.data)) {
+    return response.data.map(normalizeChofer);
+  }
+
+  return [];
+};
 
 export const useChofer = () => {
-  const [chofer, setChofer] = useState([]);
+  const [choferes, setChoferes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
 
-  const fetchChofer = useCallback(async () => {
+  const fetchChoferes = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await getChofer();
-      // Soporta tanto arrays como objetos { data: [...] }
-      setChofer(Array.isArray(response) ? response : response.data || []);
+      setChoferes(extractChoferes(response));
     } catch (err) {
-      setError(err.message || "Error desconocido");
-      console.error("Error al cargar chofer:", err);
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
+      console.error("Error al cargar choferes:", err);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchChofer();
-  }, [fetchChofer]);
+    fetchChoferes();
+  }, [fetchChoferes]);
 
-  const handleCreate = async (choferData) => {
+  const handleCreate = async (data) => {
     setLoadingCreate(true);
     setError(null);
     try {
-      const response = await postChofer(choferData);
-      const nuevoCliente = response.data;
-      if (nuevoCliente) setChofer((prev) => [...prev, nuevoCliente]);
-      return { success: true, data: nuevoCliente };
+      console.log("Creating chofer with data:", data);
+
+      await postChofer(data);
+      await fetchChoferes(); // Recarga la lista completa
+
+      return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
-      console.error("Error al crear cliente:", err);
-      return { success: false, error: err.message };
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+
+      setError(errorMsg);
+      console.error("Error al crear chofer:", err);
+      console.error("Error response:", err?.response?.data);
+
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingCreate(false);
     }
   };
 
-  const handleUpdate = async (id, choferData) => {
+  const handleUpdate = async (id, data) => {
     setLoadingUpdate(true);
     setError(null);
     try {
-      const response = await putChofer(id, choferData);
-      const choferActualizado = response.data;
-      if (choferActualizado) {
-        setChofer((prev) =>
-          prev.map((cliente) =>
-            cliente.id === id ? choferActualizado : cliente
-          )
-        );
-      }
-      return { success: true, data: choferActualizado };
+      console.log("Updating chofer ID:", id);
+      console.log("Update data:", data);
+
+      await putChofer(id, data);
+      await fetchChoferes(); // Recarga la lista
+
+      return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+
+      setError(errorMsg);
       console.error("Error al actualizar chofer:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingUpdate(false);
     }
@@ -77,20 +138,32 @@ export const useChofer = () => {
     setLoadingDelete(true);
     setError(null);
     try {
+      console.log("Deleting chofer ID:", id);
       await deleteChofer(id);
-      setChofer((prev) => prev.filter((chofer) => chofer.id !== id));
+
+      // Actualización optimista
+      setChoferes((prev) =>
+        prev.filter((c) => c.id !== id && c.idChofer !== id),
+      );
+
       return { success: true };
     } catch (err) {
-      setError(err.message || "Error desconocido");
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
       console.error("Error al eliminar chofer:", err);
-      return { success: false, error: err.message };
+      console.error("Error response:", err?.response?.data);
+      return { success: false, error: errorMsg };
     } finally {
       setLoadingDelete(false);
     }
   };
 
   return {
-    chofer,
+    choferes,
     loading,
     error,
     loadingCreate,
@@ -99,6 +172,6 @@ export const useChofer = () => {
     handleCreate,
     handleUpdate,
     handleDelete,
-    refetch: fetchChofer,
+    refetch: fetchChoferes,
   };
 };

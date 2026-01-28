@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useChofer } from '../../hooks/entities/useChofer';
 import { ChoferTable } from './ChoferTable';
 import { ChoferForm } from './ChoferForm';
+import { ChoferDetailDialog } from './ChoferDetailDialog';
 import { createChoferColumns } from './ChoferTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { AlertCircle } from 'lucide-react';
 
 export const Chofer = () => {
   const {
-    chofer,
+    choferes,
     loading,
     error,
     loadingCreate,
@@ -27,15 +28,21 @@ export const Chofer = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedChofer, setSelectedChofer] = useState(null);
 
-  const handleEditClick = (cliente) => {
-    setSelectedChofer(cliente);
+  const handleViewClick = (chofer) => {
+    setSelectedChofer(chofer);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handleEditClick = (chofer) => {
+    setSelectedChofer(chofer);
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteClick = (cliente) => {
-    setSelectedChofer(cliente);
+  const handleDeleteClick = (chofer) => {
+    setSelectedChofer(chofer);
     setIsDeleteDialogOpen(true);
   };
 
@@ -49,7 +56,7 @@ export const Chofer = () => {
 
   const handleUpdateSubmit = async (data) => {
     if (!selectedChofer) return;
-    const result = await handleUpdate(selectedChofer.id, data);
+    const result = await handleUpdate(selectedChofer.idChofer || selectedChofer.id, data);
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedChofer(null);
@@ -59,14 +66,14 @@ export const Chofer = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedChofer) return;
-    const result = await handleDelete(selectedChofer.id);
+    const result = await handleDelete(selectedChofer.idChofer || selectedChofer.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedChofer(null);
     }
   };
 
-  const columns = createChoferColumns(handleEditClick, handleDeleteClick);
+  const columns = createChoferColumns(handleEditClick, handleDeleteClick, handleViewClick);
 
   if (loading) {
     return (
@@ -105,7 +112,13 @@ export const Chofer = () => {
         </Alert>
       )}
 
-      <ChoferTable columns={columns} data={chofer} />
+      <ChoferTable columns={columns} data={choferes} />
+
+      <ChoferDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        chofer={selectedChofer}
+      />
 
       <ChoferForm
         open={isCreateDialogOpen}
@@ -129,7 +142,7 @@ export const Chofer = () => {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar a ${selectedChofer?.nombre}? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de eliminar a ${selectedChofer?.nombreCompleto}? Esta acción no se puede deshacer.`}
       />
     </div>
   );

@@ -1,24 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, Mail, Phone, Building } from "lucide-react";
+import { Eye, Edit, Trash2, Phone, Truck, AlertCircle } from "lucide-react";
 import { ArrowUpDown } from 'lucide-react';
 
 export const createChoferColumns = (onEdit, onDelete, onView) => [
   {
-    accessorKey: 'id',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          ID
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: 'nombre',
+    accessorKey: 'nombreCompleto',
     header: ({ column }) => {
       return (
         <Button
@@ -30,56 +16,71 @@ export const createChoferColumns = (onEdit, onDelete, onView) => [
         </Button>
       );
     },
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
     cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4 text-gray-500" />
-          <span>{row.original.email}</span>
-        </div>
-      );
+      const nombre = row.original.persona?.nombre || row.original.nombre || '';
+      const apellido = row.original.persona?.apellido || row.original.apellido || '';
+      return `${nombre} ${apellido}`.trim() || 'Sin nombre';
     },
   },
   {
     accessorKey: 'telefono',
     header: 'Teléfono',
     cell: ({ row }) => {
+      const telefono = row.original.persona?.telefono || row.original.telefono || 'Sin teléfono';
       return (
         <div className="flex items-center gap-2">
           <Phone className="h-4 w-4 text-gray-500" />
-          <span>{row.original.telefono}</span>
+          <span>{telefono}</span>
         </div>
       );
     },
   },
   {
-    accessorKey: 'empresa',
-    header: 'Empresa',
+    accessorKey: 'cuit',
+    header: 'CUIT',
     cell: ({ row }) => {
+      const cuit = row.original.persona?.cuit || row.original.cuit || 'Sin CUIT';
+      return <span className="font-mono">{cuit}</span>;
+    },
+  },
+  {
+    accessorKey: 'estadoDisponibilidad',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Estado
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const estado = row.original.estadoDisponibilidad;
       return (
         <div className="flex items-center gap-2">
-          <Building className="h-4 w-4 text-gray-500" />
-          <span>{row.original.empresa}</span>
+          {estado === 'Disponible' && <AlertCircle className="h-4 w-4 text-green-500" />}
+          {estado === 'Inhabilitado' && <AlertCircle className="h-4 w-4 text-red-500" />}
+          {estado === 'En viaje' && <Truck className="h-4 w-4 text-blue-500" />}
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            estado === 'Disponible' 
+              ? 'bg-green-100 text-green-700' 
+              : estado === 'En viaje'
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-red-100 text-red-700'
+          }`}>
+            {estado || 'Sin estado'}
+          </span>
         </div>
       );
-    },
-  },
-  {
-    accessorKey: 'fechaCreacion',
-    header: 'Fecha',
-    cell: ({ row }) => {
-      const fecha = row.original.fechaCreacion;
-      return new Date(fecha).toLocaleDateString('es-ES');
     },
   },
   {
     id: 'acciones',
     header: 'Acciones',
     cell: ({ row }) => {
-      const cliente = row.original;
+      const chofer = row.original;
 
       return (
         <div className="flex items-center gap-2">
@@ -87,7 +88,7 @@ export const createChoferColumns = (onEdit, onDelete, onView) => [
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 hover:bg-blue-50"
-            onClick={() => onView && onView(cliente)}
+            onClick={() => onView && onView(chofer)}
             title="Ver detalles"
           >
             <Eye className="h-4 w-4 text-blue-600" />
@@ -96,7 +97,7 @@ export const createChoferColumns = (onEdit, onDelete, onView) => [
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 hover:bg-yellow-50"
-            onClick={() => onEdit(cliente)}
+            onClick={() => onEdit(chofer)}
             title="Editar"
           >
             <Edit className="h-4 w-4 text-yellow-600" />
@@ -105,7 +106,7 @@ export const createChoferColumns = (onEdit, onDelete, onView) => [
             variant="ghost"
             size="sm"
             className="h-8 w-8 p-0 hover:bg-red-50"
-            onClick={() => onDelete(cliente)}
+            onClick={() => onDelete(chofer)}
             title="Eliminar"
           >
             <Trash2 className="h-4 w-4 text-red-600" />

@@ -29,6 +29,7 @@ export const ChoferTable = ({ columns, data }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getRowId: (row) => String(row.idChofer || row.id),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     state: {
@@ -42,9 +43,9 @@ export const ChoferTable = ({ columns, data }) => {
       <div className="flex items-center justify-between">
         <Input
           placeholder="Filtrar por nombre..."
-          value={table.getColumn('nombre')?.getFilterValue() ?? ''}
+          value={table.getColumn('nombreCompleto')?.getFilterValue() ?? ''}
           onChange={(event) =>
-            table.getColumn('nombre')?.setFilterValue(event.target.value)
+            table.getColumn('nombreCompleto')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
