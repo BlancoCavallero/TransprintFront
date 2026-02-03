@@ -1,30 +1,32 @@
-import {
-  getGeneric,
-  postGeneric,
-  putGeneric,
-  deleteGeneric,
-} from "./genericService";
+import axios from "axios";
+import { backend_url } from "../configuration/app.config";
+
+const api = axios.create({
+  baseURL: backend_url,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export const getViajes = async () => {
-  return await getGeneric("/viajes");
+  const response = await api.get("/viajes");
+  return response.data;
 };
-
-// Si en el futuro el back soporta a /viajes?page=1&limit=10
-// export const getviajess = async (params = {}) => {
-//   return await getGeneric("/viajes", params);
-// };
 
 // Registrar viajes
 export const postViajes = async (data) => {
-  return await postGeneric("/viajes", data);
+  const response = await api.post("/viajes", data);
+  return response.data;
 };
 
 // Actualizar viajes
 export const putViajes = async (id, data) => {
-  return await putGeneric(`/viajes/${id}`, data);
+  const response = await api.put(`/viajes/${id}`, data);
+  return response.data;
 };
 
 // Eliminar viajes
 export const deleteViajes = async (id) => {
-  return await deleteGeneric(`/viajes/${id}`);
+  const response = await api.delete(`/viajes/${id}`);
+  return response.data;
 };

@@ -41,10 +41,10 @@ export const ViajeTable = ({ columns, data }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Input
-          placeholder="Filtrar por origen..."
-          value={table.getColumn('origen')?.getFilterValue() ?? ''}
+          placeholder="Filtrar por ruta..."
+          value={table.getColumn('ruta')?.getFilterValue() ?? ''}
           onChange={(event) =>
-            table.getColumn('origen')?.setFilterValue(event.target.value)
+            table.getColumn('ruta')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

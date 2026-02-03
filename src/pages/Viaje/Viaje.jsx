@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useViajes } from '../../hooks/entities/useViajes';
 import { ViajeTable } from './ViajeTable';
 import { ViajeForm } from './ViajeForm';
+import { ViajeDetailDialog } from './ViajeDetailDialog';
 import { createViajeColumns } from './ViajeTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
@@ -26,15 +27,21 @@ export const Viaje = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const handleViewClick = (item) => {
+    setSelectedItem({ ...item });
+    setIsDetailDialogOpen(true);
+  };
+
   const handleEditClick = (item) => {
-    setSelectedItem(item);
+    setSelectedItem({ ...item });
     setIsEditDialogOpen(true);
   };
 
   const handleDeleteClick = (item) => {
-    setSelectedItem(item);
+    setSelectedItem({ ...item });
     setIsDeleteDialogOpen(true);
   };
 
@@ -48,7 +55,11 @@ export const Viaje = () => {
 
   const handleUpdateSubmit = async (data) => {
     if (!selectedItem) return;
-    const result = await handleUpdate(selectedItem.id, data);
+    const result = await handleUpdate(
+      selectedItem.idViaje || selectedItem.id,
+      data,
+      selectedItem
+    );
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedItem(null);
@@ -58,14 +69,18 @@ export const Viaje = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedItem) return;
-    const result = await handleDelete(selectedItem.id);
+    const result = await handleDelete(selectedItem.idViaje || selectedItem.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedItem(null);
     }
   };
 
-  const columns = createViajeColumns(handleEditClick, handleDeleteClick);
+  const columns = createViajeColumns(
+    handleEditClick,
+    handleDeleteClick,
+    handleViewClick
+  );
 
   if (loading) {
     return (
@@ -123,12 +138,18 @@ export const Viaje = () => {
         mode="edit"
       />
 
+      <ViajeDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        viaje={selectedItem}
+      />
+
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar el viaje con ID ${selectedItem?.id}? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de eliminar este viaje? Esta acción no se puede deshacer.`}
       />
     </div>
   );
