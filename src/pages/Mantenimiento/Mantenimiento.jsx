@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMantenimiento } from '../../hooks/entities/useMantenimiento';
 import { MantenimientoTable } from './MantenimientoTable';
 import { MantenimientoForm } from './MantenimientoForm';
+import { MantenimientoDetailDialog } from './MantenimientoDetailDialog';
 import { createMantenimientoColumns } from './MantenimientoTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
@@ -27,15 +28,21 @@ export const Mantenimiento = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const handleViewClick = (item) => {
+    setSelectedItem({ ...item });
+    setIsDetailDialogOpen(true);
+  };
+
   const handleEditClick = (item) => {
-    setSelectedItem(item);
+    setSelectedItem({ ...item });
     setIsEditDialogOpen(true);
   };
 
   const handleDeleteClick = (item) => {
-    setSelectedItem(item);
+    setSelectedItem({ ...item });
     setIsDeleteDialogOpen(true);
   };
 
@@ -49,7 +56,11 @@ export const Mantenimiento = () => {
 
   const handleUpdateSubmit = async (data) => {
     if (!selectedItem) return;
-    const result = await handleUpdate(selectedItem.id, data);
+    const result = await handleUpdate(
+      selectedItem.idMantenimiento || selectedItem.id,
+      data,
+      selectedItem
+    );
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedItem(null);
@@ -59,14 +70,18 @@ export const Mantenimiento = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedItem) return;
-    const result = await handleDelete(selectedItem.id);
+    const result = await handleDelete(selectedItem.idMantenimiento || selectedItem.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedItem(null);
     }
   };
 
-  const columns = createMantenimientoColumns(handleEditClick, handleDeleteClick);
+  const columns = createMantenimientoColumns(
+    handleEditClick,
+    handleDeleteClick,
+    handleViewClick
+  );
 
   if (loading) {
     return (
@@ -124,12 +139,18 @@ export const Mantenimiento = () => {
         mode="edit"
       />
 
+      <MantenimientoDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        mantenimiento={selectedItem}
+      />
+
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar el mantenimiento con fecha ${selectedItem?.fecha}? Esta acción no se puede deshacer.`}
+        description={`¿Estás seguro de eliminar el mantenimiento del vehículo ${selectedItem?.vehiculo?.patente || 'seleccionado'}? Esta acción no se puede deshacer.`}
       />
     </div>
   );
