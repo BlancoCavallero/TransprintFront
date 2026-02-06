@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import PrivateRoute from "./PrivateRoute";
+import AdminRoute from "./AdminRoute";
 import PublicRoute from "./PublicRoute";
 
 // Imports de páginas
@@ -30,12 +31,16 @@ export const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/chofer" element={<Chofer />} />
           <Route path="/mantenimiento" element={<Mantenimiento />} />
-          <Route path="/usuario" element={<Usuario />} />
           <Route path="/reporte" element={<Reporte />} />
           <Route path="/viaje" element={<Viaje />} />
           <Route path="/vehiculo" element={<Vehiculo />} />
           <Route path="/cliente" element={<Cliente />} />
           <Route path="/*" element={<Navigate to="/dashboard" />} />
+        </Route>
+
+        {/* Ruta solo para administradores */}
+        <Route element={<AdminRoute />}>
+          <Route path="/usuario" element={<Usuario />} />
         </Route>
       </Route>
     </Routes>

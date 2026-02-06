@@ -3,15 +3,16 @@ import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
 import { Header } from "../components/Header/Header";
+import { useInitializeUserData } from "../hooks/useInitializeUserData";
 import "./privateLayout.css";
-
-
-// import { useAuth } from "../hooks/useAuth";
 
 const PrivateLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-//   const {user}=useAuth();
+  
+  // Cargar datos completos del usuario cuando entra a la app
+  useInitializeUserData();
+  
   const location = useLocation();
   const isWelcomePage = location.pathname.includes("dashboard");
 

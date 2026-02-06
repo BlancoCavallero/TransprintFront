@@ -42,7 +42,9 @@ export const useUsuario = () => {
     setError(null);
     try {
       const response = await getUsuario();
-      setUsuarios(extractUsers(response));
+      const usuariosList = extractUsers(response);
+      setUsuarios(usuariosList);
+      console.log("Usuarios cargados:", usuariosList);
     } catch (err) {
       setError(err.message || "Error desconocido");
       console.error("Error al cargar usuarios:", err);

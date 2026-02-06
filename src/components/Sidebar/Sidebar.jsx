@@ -1,5 +1,6 @@
 import { SidebarList } from "./SidebarList/SidebarList";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import "./sidebar.css";
 import { 
   FaChartBar,
@@ -14,7 +15,7 @@ import { IoMdSettings } from "react-icons/io";
 import { FaHouse, FaPerson,FaPersonCircleCheck} from "react-icons/fa6";
 import { GiPathDistance } from "react-icons/gi";
 
-const menuItems = [
+const allMenuItems = [
   {
     id: 1,
     icon: <FaHouse className="icon-violet" />,
@@ -56,6 +57,7 @@ const menuItems = [
     icon: <FaUserCog className="icon-violet" />,
     text: "Usuarios",
     path: "/usuario",
+    adminOnly: true, // Este item solo se muestra para administradores
   },
   {
     id: 8,
@@ -65,18 +67,22 @@ const menuItems = [
   }
 ];
 
-const Sidebar = ({ isCollapsed, toggleSidebar, isMobile, user }) => {
-// El sidebar puede recibir user que seria luego para limitar las opciones que ve cada rol de usuario. Actualmente lo borre de los props porque no lo estoy usando. 
+const Sidebar = ({ isCollapsed, toggleSidebar, isMobile }) => {
+  const { user, userDataReady } = useAuth();
+  
+  // Filtrar items del menu según el rol del usuario
+  const isAdmin = userDataReady && Array.isArray(user?.roles) && user.roles.includes("Administrador");
+  const menuItems = allMenuItems.filter(item => !item.adminOnly || isAdmin); 
 
   return (
     <>
       <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
         <div className="sidebar__header">
-          {isMobile && (
+          {/* {isMobile && (
             <button className="sidebar__collapse-btn" onClick={toggleSidebar}>
               ←
             </button>
-          )}
+          )} */}
           <Link
             to="/gestion-welcome"
             className="siderbar__logo"
