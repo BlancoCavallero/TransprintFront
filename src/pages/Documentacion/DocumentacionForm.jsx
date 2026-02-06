@@ -123,8 +123,8 @@ export const DocumentacionForm = ({
                     value={field.value}
                     disabled={isLoading}
                   >
-                    <FormControl>
-                      <SelectTrigger>
+                    <FormControl className="w-full">
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Seleccione un tipo" />
                       </SelectTrigger>
                     </FormControl>
