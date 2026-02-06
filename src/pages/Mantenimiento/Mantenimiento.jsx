@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const Mantenimiento = () => {
   const {
@@ -50,6 +51,13 @@ export const Mantenimiento = () => {
     const result = await handleCreate(data);
     if (result.success) {
       setIsCreateDialogOpen(false);
+      toast.success('Mantenimiento creado exitosamente', {
+        description: 'El mantenimiento ha sido registrado en el sistema.'
+      });
+    } else {
+      toast.error('Error al crear mantenimiento', {
+        description: result.error || 'Ocurrió un error al intentar crear el mantenimiento.'
+      });
     }
     return result;
   };
@@ -64,6 +72,13 @@ export const Mantenimiento = () => {
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedItem(null);
+      toast.success('Mantenimiento actualizado exitosamente', {
+        description: 'Los datos del mantenimiento han sido actualizados.'
+      });
+    } else {
+      toast.error('Error al actualizar mantenimiento', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el mantenimiento.'
+      });
     }
     return result;
   };
@@ -74,6 +89,13 @@ export const Mantenimiento = () => {
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedItem(null);
+      toast.success('Mantenimiento eliminado exitosamente', {
+        description: 'El mantenimiento ha sido eliminado del sistema.'
+      });
+    } else {
+      toast.error('Error al eliminar mantenimiento', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el mantenimiento.'
+      });
     }
   };
 

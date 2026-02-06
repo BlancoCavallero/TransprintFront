@@ -10,6 +10,7 @@ import { Plus, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'sonner';
 
 export const Cliente = () => {
   const {
@@ -55,6 +56,13 @@ export const Cliente = () => {
     const result = await handleCreate(data);
     if (result.success) {
       setIsCreateDialogOpen(false);
+      toast.success('Cliente creado exitosamente', {
+        description: `${data.nombreCompleto || data.razonSocial} ha sido agregado al sistema.`
+      });
+    } else {
+      toast.error('Error al crear cliente', {
+        description: result.error || 'Ocurrió un error al intentar crear el cliente.'
+      });
     }
     return result;
   };
@@ -65,6 +73,13 @@ export const Cliente = () => {
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedCliente(null);
+      toast.success('Cliente actualizado exitosamente', {
+        description: `Los datos de ${data.nombreCompleto || data.razonSocial} han sido actualizados.`
+      });
+    } else {
+      toast.error('Error al actualizar cliente', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el cliente.'
+      });
     }
     return result;
   };
@@ -75,6 +90,13 @@ export const Cliente = () => {
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedCliente(null);
+      toast.success('Cliente eliminado exitosamente', {
+        description: `${selectedCliente.nombreCompleto || selectedCliente.razonSocial} ha sido eliminado del sistema.`
+      });
+    } else {
+      toast.error('Error al eliminar cliente', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el cliente.'
+      });
     }
   };
 

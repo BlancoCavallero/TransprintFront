@@ -16,6 +16,7 @@ import { DocumentacionTable } from '../Documentacion/DocumentacionTable';
 import { DocumentacionDetailDialog } from '../Documentacion/DocumentacionDetailDialog';
 import { createDocumentacionColumns } from '../Documentacion/DocumentacionTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
+import { toast } from 'sonner';
 
 export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
   const [activeTab, setActiveTab] = useState('detalles');
@@ -82,6 +83,13 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
     const result = await handleCreateDoc(data);
     if (result.success) {
       setIsCreateDocOpen(false);
+      toast.success('Documentación registrada exitosamente', {
+        description: `La documentación de tipo "${data.tipo}" ha sido agregada al chofer.`
+      });
+    } else {
+      toast.error('Error al registrar documentación', {
+        description: result.error || 'Ocurrió un error al intentar registrar la documentación.'
+      });
     }
     return result;
   };
@@ -96,6 +104,13 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
     if (result.success) {
       setIsEditDocOpen(false);
       setSelectedDoc(null);
+      toast.success('Documentación actualizada exitosamente', {
+        description: 'Los datos de la documentación han sido actualizados.'
+      });
+    } else {
+      toast.error('Error al actualizar documentación', {
+        description: result.error || 'Ocurrió un error al intentar actualizar la documentación.'
+      });
     }
     return result;
   };
@@ -106,6 +121,13 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
     if (result.success) {
       setIsDeleteDocOpen(false);
       setSelectedDoc(null);
+      toast.success('Documentación eliminada exitosamente', {
+        description: 'La documentación ha sido eliminada del chofer.'
+      });
+    } else {
+      toast.error('Error al eliminar documentación', {
+        description: result.error || 'Ocurrió un error al intentar eliminar la documentación.'
+      });
     }
   };
 

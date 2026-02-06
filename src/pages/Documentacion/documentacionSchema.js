@@ -17,12 +17,12 @@ export const getDocumentacionSchema = (tipoEntidad) => {
     detalle: z
       .string()
       .min(1, { message: 'El detalle es obligatorio' }),
-    // renovacion: z.coerce
-    //   .number()
-    //   .int({ message: 'La renovación debe ser un número entero' })
-    //   .positive({ message: 'La renovación debe ser mayor a 0' })
-    //   .optional()
-    //   .nullable(),
+    renovacion: z.coerce
+      .number({ invalid_type_error: 'Debe ingresar un número' })
+      .int({ message: 'La renovación debe ser un número entero' })
+      .positive({ message: 'La renovación debe ser mayor a 0' })
+      .optional()
+      .or(z.literal('')),
     fechaVencimiento: z
       .string()
       .min(1, { message: 'La fecha de vencimiento es obligatoria' })

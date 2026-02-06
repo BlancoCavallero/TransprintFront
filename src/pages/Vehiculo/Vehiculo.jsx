@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const Vehiculo = () => {
   const {
@@ -50,6 +51,13 @@ export const Vehiculo = () => {
     const result = await handleCreate(data);
     if (result.success) {
       setIsCreateDialogOpen(false);
+      toast.success('Vehículo creado exitosamente', {
+        description: `El vehículo ${data.patente} ha sido agregado al sistema.`
+      });
+    } else {
+      toast.error('Error al crear vehículo', {
+        description: result.error || 'Ocurrió un error al intentar crear el vehículo.'
+      });
     }
     return result;
   };
@@ -64,6 +72,13 @@ export const Vehiculo = () => {
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedVehiculo(null);
+      toast.success('Vehículo actualizado exitosamente', {
+        description: `Los datos del vehículo ${data.patente} han sido actualizados.`
+      });
+    } else {
+      toast.error('Error al actualizar vehículo', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el vehículo.'
+      });
     }
     return result;
   };
@@ -74,6 +89,13 @@ export const Vehiculo = () => {
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedVehiculo(null);
+      toast.success('Vehículo eliminado exitosamente', {
+        description: `El vehículo ${selectedVehiculo.patente} ha sido eliminado del sistema.`
+      });
+    } else {
+      toast.error('Error al eliminar vehículo', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el vehículo.'
+      });
     }
   };
 

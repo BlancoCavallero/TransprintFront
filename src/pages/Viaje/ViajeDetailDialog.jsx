@@ -16,6 +16,7 @@ import { GastoTable } from '../Gasto/GastoTable';
 import { GastoDetailDialog } from '../Gasto/GastoDetailDialog';
 import { createGastoColumns } from '../Gasto/GastoTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
+import { toast } from 'sonner';
 
 export const ViajeDetailDialog = ({ open, onOpenChange, viaje }) => {
   const [activeTab, setActiveTab] = useState('detalles');
@@ -83,6 +84,13 @@ export const ViajeDetailDialog = ({ open, onOpenChange, viaje }) => {
     const result = await handleCreateGasto(data);
     if (result.success) {
       setIsCreateGastoOpen(false);
+      toast.success('Gasto registrado exitosamente', {
+        description: `El gasto de tipo "${data.tipo}" ha sido agregado al viaje.`
+      });
+    } else {
+      toast.error('Error al registrar gasto', {
+        description: result.error || 'Ocurrió un error al intentar registrar el gasto.'
+      });
     }
     return result;
   };
@@ -97,6 +105,13 @@ export const ViajeDetailDialog = ({ open, onOpenChange, viaje }) => {
     if (result.success) {
       setIsEditGastoOpen(false);
       setSelectedGasto(null);
+      toast.success('Gasto actualizado exitosamente', {
+        description: `Los datos del gasto han sido actualizados.`
+      });
+    } else {
+      toast.error('Error al actualizar gasto', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el gasto.'
+      });
     }
     return result;
   };
@@ -107,6 +122,13 @@ export const ViajeDetailDialog = ({ open, onOpenChange, viaje }) => {
     if (result.success) {
       setIsDeleteGastoOpen(false);
       setSelectedGasto(null);
+      toast.success('Gasto eliminado exitosamente', {
+        description: `El gasto de tipo "${selectedGasto.tipo}" ha sido eliminado.`
+      });
+    } else {
+      toast.error('Error al eliminar gasto', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el gasto.'
+      });
     }
   };
 

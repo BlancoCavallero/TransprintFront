@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const Viaje = () => {
   const {
@@ -49,6 +50,13 @@ export const Viaje = () => {
     const result = await handleCreate(data);
     if (result.success) {
       setIsCreateDialogOpen(false);
+      toast.success('Viaje creado exitosamente', {
+        description: 'El viaje ha sido registrado en el sistema.'
+      });
+    } else {
+      toast.error('Error al crear viaje', {
+        description: result.error || 'Ocurrió un error al intentar crear el viaje.'
+      });
     }
     return result;
   };
@@ -63,6 +71,13 @@ export const Viaje = () => {
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedItem(null);
+      toast.success('Viaje actualizado exitosamente', {
+        description: 'Los datos del viaje han sido actualizados.'
+      });
+    } else {
+      toast.error('Error al actualizar viaje', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el viaje.'
+      });
     }
     return result;
   };
@@ -73,6 +88,13 @@ export const Viaje = () => {
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedItem(null);
+      toast.success('Viaje eliminado exitosamente', {
+        description: 'El viaje ha sido eliminado del sistema.'
+      });
+    } else {
+      toast.error('Error al eliminar viaje', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el viaje.'
+      });
     }
   };
 

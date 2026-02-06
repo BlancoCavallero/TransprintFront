@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const Chofer = () => {
   const {
@@ -50,6 +51,13 @@ export const Chofer = () => {
     const result = await handleCreate(data);
     if (result.success) {
       setIsCreateDialogOpen(false);
+      toast.success('Chofer creado exitosamente', {
+        description: `${data.nombreCompleto} ha sido agregado al sistema.`
+      });
+    } else {
+      toast.error('Error al crear chofer', {
+        description: result.error || 'Ocurrió un error al intentar crear el chofer.'
+      });
     }
     return result;
   };
@@ -60,6 +68,13 @@ export const Chofer = () => {
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedChofer(null);
+      toast.success('Chofer actualizado exitosamente', {
+        description: `Los datos de ${data.nombreCompleto} han sido actualizados.`
+      });
+    } else {
+      toast.error('Error al actualizar chofer', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el chofer.'
+      });
     }
     return result;
   };
@@ -70,6 +85,13 @@ export const Chofer = () => {
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedChofer(null);
+      toast.success('Chofer eliminado exitosamente', {
+        description: `${selectedChofer.nombreCompleto} ha sido eliminado del sistema.`
+      });
+    } else {
+      toast.error('Error al eliminar chofer', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el chofer.'
+      });
     }
   };
 

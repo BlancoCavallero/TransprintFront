@@ -16,6 +16,7 @@ import { DocumentacionTable } from '../Documentacion/DocumentacionTable';
 import { DocumentacionDetailDialog } from '../Documentacion/DocumentacionDetailDialog';
 import { createDocumentacionColumns } from '../Documentacion/DocumentacionTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
+import { toast } from 'sonner';
 
 export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
   const [activeTab, setActiveTab] = useState('detalles');
@@ -90,6 +91,13 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
     const result = await handleCreateDoc(data);
     if (result.success) {
       setIsCreateDocOpen(false);
+      toast.success('Documentación registrada exitosamente', {
+        description: `La documentación de tipo "${data.tipo}" ha sido agregada al vehículo.`
+      });
+    } else {
+      toast.error('Error al registrar documentación', {
+        description: result.error || 'Ocurrió un error al intentar registrar la documentación.'
+      });
     }
     return result;
   };
@@ -104,6 +112,13 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
     if (result.success) {
       setIsEditDocOpen(false);
       setSelectedDoc(null);
+      toast.success('Documentación actualizada exitosamente', {
+        description: 'Los datos de la documentación han sido actualizados.'
+      });
+    } else {
+      toast.error('Error al actualizar documentación', {
+        description: result.error || 'Ocurrió un error al intentar actualizar la documentación.'
+      });
     }
     return result;
   };
@@ -114,6 +129,13 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
     if (result.success) {
       setIsDeleteDocOpen(false);
       setSelectedDoc(null);
+      toast.success('Documentación eliminada exitosamente', {
+        description: 'La documentación ha sido eliminada del vehículo.'
+      });
+    } else {
+      toast.error('Error al eliminar documentación', {
+        description: result.error || 'Ocurrió un error al intentar eliminar la documentación.'
+      });
     }
   };
 

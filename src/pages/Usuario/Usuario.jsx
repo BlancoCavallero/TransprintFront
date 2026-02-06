@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const Usuario = () => {
   const {
@@ -43,6 +44,13 @@ export const Usuario = () => {
     const result = await handleCreate(data);
     if (result.success) {
       setIsCreateDialogOpen(false);
+      toast.success('Usuario creado exitosamente', {
+        description: `${data.nombre_completo || data.username} ha sido agregado al sistema.`
+      });
+    } else {
+      toast.error('Error al crear usuario', {
+        description: result.error || 'Ocurrió un error al intentar crear el usuario.'
+      });
     }
     return result;
   };
@@ -53,6 +61,13 @@ export const Usuario = () => {
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedUsuario(null);
+      toast.success('Usuario actualizado exitosamente', {
+        description: `Los datos de ${data.nombre_completo || data.username} han sido actualizados.`
+      });
+    } else {
+      toast.error('Error al actualizar usuario', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el usuario.'
+      });
     }
     return result;
   };
@@ -63,6 +78,13 @@ export const Usuario = () => {
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedUsuario(null);
+      toast.success('Usuario eliminado exitosamente', {
+        description: `${selectedUsuario.nombre_completo || selectedUsuario.username} ha sido eliminado del sistema.`
+      });
+    } else {
+      toast.error('Error al eliminar usuario', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el usuario.'
+      });
     }
   };
 

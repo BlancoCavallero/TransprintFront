@@ -47,7 +47,7 @@ export const DocumentacionForm = ({
     defaultValues: {
       nombre: '',
       detalle: '',
-      // renovacion: '',
+      renovacion: '',
       fechaVencimiento: '',
       ...defaultValues,
     },
@@ -59,14 +59,14 @@ export const DocumentacionForm = ({
         form.reset({
           nombre: '',
           detalle: '',
-          // renovacion: '',
+          renovacion: '',
           fechaVencimiento: '',
         });
       } else if (defaultValues) {
         form.reset({
           nombre: defaultValues.nombre || '',
           detalle: defaultValues.detalle || '',
-          // renovacion: defaultValues.renovacion || '',
+          renovacion: defaultValues.renovacion || '',
           fechaVencimiento: defaultValues.fechaVencimiento
             ? new Date(defaultValues.fechaVencimiento.split('/').reverse().join('-'))
                 .toISOString()
@@ -159,12 +159,12 @@ export const DocumentacionForm = ({
               )}
             />
 
-            {/* <FormField
+            <FormField
               control={form.control}
               name="renovacion"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Renovación (días)</FormLabel>
+                  <FormLabel>Renovación (días) *</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -176,7 +176,7 @@ export const DocumentacionForm = ({
                   <FormMessage />
                 </FormItem>
               )}
-            /> */}
+            />
 
             <FormField
               control={form.control}
