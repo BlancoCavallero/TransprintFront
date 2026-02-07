@@ -114,7 +114,7 @@ export const ChoferForm = ({
                   <FormItem>
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="Axel" {...field} />
+                      <Input placeholder="Jorge" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -128,7 +128,7 @@ export const ChoferForm = ({
                   <FormItem>
                     <FormLabel>Apellido</FormLabel>
                     <FormControl>
-                      <Input placeholder="Monzón" {...field} />
+                      <Input placeholder="Perez" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -143,7 +143,7 @@ export const ChoferForm = ({
                 <FormItem>
                   <FormLabel>CUIT</FormLabel>
                   <FormControl>
-                    <Input placeholder="20408801940" maxLength={11} {...field} />
+                    <Input placeholder="20409873460" maxLength={11} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

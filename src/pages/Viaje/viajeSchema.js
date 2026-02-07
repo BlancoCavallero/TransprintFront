@@ -125,11 +125,10 @@ const editViajeSchema = z.object({
     .positive("El precio debe ser mayor a 0")
     .optional(),
 
-  estado: z.enum(["CANCELADO"], {
-    errorMap: () => ({
-      message: "Solo se puede cambiar el estado a CANCELADO",
-    }),
-  }).optional(),
+  estado: z.union([
+    z.literal(""),
+    z.enum(["CANCELADO"])
+  ]).optional(),
 
   motivoCancelacion: z
     .string()

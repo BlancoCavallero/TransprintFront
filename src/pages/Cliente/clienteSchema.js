@@ -18,7 +18,7 @@ export const createClienteSchema = z.object({
     .min(3, "La razón social debe tener al menos 3 caracteres")
     .max(200, "La razón social no puede exceder 200 caracteres"),
 
-  tipo: z.enum(["Empresa", "Particular"], {
+  tipo: z.enum(["Empresa", "Productor"], {
     errorMap: () => ({ message: "Selecciona un tipo de cliente válido" }),
   }),
 

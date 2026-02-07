@@ -24,9 +24,8 @@ const mantenimientoBaseSchema = z.object({
     .or(z.literal("")),
 
   idVehiculo: z
-    .number({ invalid_type_error: "Debe seleccionar un vehículo" })
-    .int("Debe seleccionar un vehículo válido")
-    .positive("Debe seleccionar un vehículo válido"),
+  .string()
+  .min(1, "Debe venir el vehículo"),
 }).refine(
   (data) => {
     const inicio = new Date(data.fechaInicio);

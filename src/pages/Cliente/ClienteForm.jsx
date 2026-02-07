@@ -47,7 +47,7 @@ export const ClienteForm = ({
     defaultValues: {
       correo: '',
       razonSocial: '',
-      tipo: 'Particular',
+      tipo: 'Productor',
       nombre: '',
       apellido: '',
       cuit: '',
@@ -62,7 +62,7 @@ export const ClienteForm = ({
       form.reset({
         correo: defaultValues.correo || '',
         razonSocial: defaultValues.razonSocial || '',
-        tipo: defaultValues.tipo || 'Particular',
+        tipo: defaultValues.tipo || 'Productor',
         nombre: defaultValues.persona?.nombre || defaultValues.nombre || '',
         apellido: defaultValues.persona?.apellido || defaultValues.apellido || '',
         cuit: String(defaultValues.persona?.cuit || defaultValues.cuit || ''),
@@ -74,7 +74,7 @@ export const ClienteForm = ({
       form.reset({
         correo: '',
         razonSocial: '',
-        tipo: 'Particular',
+        tipo: 'Productor',
         nombre: '',
         apellido: '',
         cuit: '',
@@ -179,7 +179,7 @@ export const ClienteForm = ({
                         <SelectValue placeholder="Selecciona un tipo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Particular">Particular</SelectItem>
+                        <SelectItem value="Productor">Productor</SelectItem>
                         <SelectItem value="Empresa">Empresa</SelectItem>
                       </SelectContent>
                     </Select>
