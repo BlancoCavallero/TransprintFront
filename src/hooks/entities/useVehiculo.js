@@ -4,6 +4,8 @@ import {
   postVehiculo,
   putVehiculo,
   deleteVehiculo,
+  bajaVehiculo,
+  reactivarVehiculo,
 } from "../../services/vehiculoService";
 
 // Normaliza un vehículo para asegurar estructura consistente
@@ -42,6 +44,8 @@ export const useVehiculo = (params = {}) => {
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingBaja, setLoadingBaja] = useState(false);
+  const [loadingReactivar, setLoadingReactivar] = useState(false);
 
   const fetchVehiculos = useCallback(async () => {
     setLoading(true);
@@ -154,6 +158,52 @@ export const useVehiculo = (params = {}) => {
     }
   };
 
+  const handleBaja = async (id) => {
+    setLoadingBaja(true);
+    setError(null);
+    try {
+      console.log("Dando de baja vehiculo ID:", id);
+      await bajaVehiculo(id);
+      await fetchVehiculos(); // Recarga la lista
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
+      console.error("Error al dar de baja vehiculo:", err);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoadingBaja(false);
+    }
+  };
+
+  const handleReactivar = async (id) => {
+    setLoadingReactivar(true);
+    setError(null);
+    try {
+      console.log("Reactivando vehiculo ID:", id);
+      await reactivarVehiculo(id);
+      await fetchVehiculos(); // Recarga la lista
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
+      console.error("Error al reactivar vehiculo:", err);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoadingReactivar(false);
+    }
+  };
+
   return {
     vehiculos,
     loading,
@@ -161,9 +211,13 @@ export const useVehiculo = (params = {}) => {
     loadingCreate,
     loadingUpdate,
     loadingDelete,
+    loadingBaja,
+    loadingReactivar,
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleBaja,
+    handleReactivar,
     refetch: fetchVehiculos,
   };
 };

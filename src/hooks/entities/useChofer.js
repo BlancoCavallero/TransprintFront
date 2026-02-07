@@ -4,6 +4,8 @@ import {
   postChofer,
   putChofer,
   deleteChofer,
+  bajaChofer,
+  reactivarChofer,
 } from "../../services/choferService";
 
 /**
@@ -55,6 +57,8 @@ export const useChofer = (params = {}) => {
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingBaja, setLoadingBaja] = useState(false);
+  const [loadingReactivar, setLoadingReactivar] = useState(false);
 
   const fetchChoferes = useCallback(async () => {
     setLoading(true);
@@ -162,6 +166,52 @@ export const useChofer = (params = {}) => {
     }
   };
 
+  const handleBaja = async (id) => {
+    setLoadingBaja(true);
+    setError(null);
+    try {
+      console.log("Dando de baja chofer ID:", id);
+      await bajaChofer(id);
+      await fetchChoferes(); // Recarga la lista
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
+      console.error("Error al dar de baja chofer:", err);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoadingBaja(false);
+    }
+  };
+
+  const handleReactivar = async (id) => {
+    setLoadingReactivar(true);
+    setError(null);
+    try {
+      console.log("Reactivando chofer ID:", id);
+      await reactivarChofer(id);
+      await fetchChoferes(); // Recarga la lista
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
+      console.error("Error al reactivar chofer:", err);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoadingReactivar(false);
+    }
+  };
+
   return {
     choferes,
     loading,
@@ -169,9 +219,13 @@ export const useChofer = (params = {}) => {
     loadingCreate,
     loadingUpdate,
     loadingDelete,
+    loadingBaja,
+    loadingReactivar,
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleBaja,
+    handleReactivar,
     refetch: fetchChoferes,
   };
 };

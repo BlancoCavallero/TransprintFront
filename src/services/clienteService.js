@@ -25,7 +25,17 @@ export const putCliente = async (id, data) => {
   return await putGeneric(`/clients/${id}`, data);
 };
 
-// Eliminar cliente
+// Eliminar cliente (deprecado - usar baja)
 export const deleteCliente = async (id) => {
   return await deleteGeneric(`/clients/${id}`);
+};
+
+// Dar de baja cliente
+export const bajaCliente = async (id) => {
+  return await putGeneric(`/clients/${id}/baja`, {});
+};
+
+// Reactivar cliente
+export const reactivarCliente = async (id) => {
+  return await putGeneric(`/clients/${id}/reactivar`, {});
 };

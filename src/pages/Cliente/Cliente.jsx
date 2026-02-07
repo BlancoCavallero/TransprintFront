@@ -22,9 +22,13 @@ export const Cliente = () => {
     loadingCreate,
     loadingUpdate,
     loadingDelete,
+    loadingBaja,
+    loadingReactivar,
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleBaja,
+    handleReactivar,
     refetch,
   } = useCliente();
 
@@ -86,16 +90,30 @@ export const Cliente = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedCliente) return;
-    const result = await handleDelete(selectedCliente.idCliente || selectedCliente.id);
+    const result = await handleBaja(selectedCliente.idCliente || selectedCliente.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedCliente(null);
-      toast.success('Cliente eliminado exitosamente', {
-        description: `${selectedCliente.nombreCompleto || selectedCliente.razonSocial} ha sido eliminado del sistema.`
+      toast.success('Cliente dado de baja exitosamente', {
+        description: `${selectedCliente.nombreCompleto || selectedCliente.razonSocial} ha sido dado de baja.`
       });
     } else {
-      toast.error('Error al eliminar cliente', {
-        description: result.error || 'Ocurrió un error al intentar eliminar el cliente.'
+      toast.error('Error al dar de baja cliente', {
+        description: result.error || 'Ocurrió un error al intentar dar de baja el cliente.'
+      });
+    }
+  };
+
+  const handleReactivarCliente = async (cliente) => {
+    const result = await handleReactivar(cliente.idCliente || cliente.id);
+    if (result.success) {
+      setIsDetailDialogOpen(false);
+      toast.success('Cliente reactivado exitosamente', {
+        description: `${cliente.nombreCompleto || cliente.razonSocial} ha sido reactivado.`
+      });
+    } else {
+      toast.error('Error al reactivar cliente', {
+        description: result.error || 'Ocurrió un error al intentar reactivar el cliente.'
       });
     }
   };
@@ -145,6 +163,8 @@ export const Cliente = () => {
         open={isDetailDialogOpen}
         onOpenChange={setIsDetailDialogOpen}
         cliente={selectedCliente}
+        onReactivar={handleReactivarCliente}
+        loadingReactivar={loadingReactivar}
       />
 
       <ClienteForm
@@ -172,8 +192,10 @@ export const Cliente = () => {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar a ${selectedCliente?.nombreCompleto || selectedCliente?.razonSocial}? Esta acción no se puede deshacer.`}
+        isLoading={loadingBaja}
+        title="Dar de Baja Cliente"
+        confirmText="Dar de Baja"
+        description={`¿Estás seguro de dar de baja a ${selectedCliente?.nombreCompleto || selectedCliente?.razonSocial}? El cliente podrá ser reactivado posteriormente.`}
       />
     </div>
   );

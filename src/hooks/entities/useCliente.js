@@ -5,6 +5,8 @@ import {
   putCliente,
   deleteCliente,
   getLocalidades,
+  bajaCliente,
+  reactivarCliente,
 } from "../../services/clienteService";
 
 /**
@@ -57,6 +59,8 @@ export const useCliente = () => {
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingBaja, setLoadingBaja] = useState(false);
+  const [loadingReactivar, setLoadingReactivar] = useState(false);
 
   const fetchClientes = useCallback(async () => {
     setLoading(true);
@@ -180,6 +184,52 @@ export const useCliente = () => {
     }
   };
 
+  const handleBaja = async (id) => {
+    setLoadingBaja(true);
+    setError(null);
+    try {
+      console.log("Dando de baja cliente ID:", id);
+      await bajaCliente(id);
+      await fetchClientes(); // Recarga la lista
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
+      console.error("Error al dar de baja cliente:", err);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoadingBaja(false);
+    }
+  };
+
+  const handleReactivar = async (id) => {
+    setLoadingReactivar(true);
+    setError(null);
+    try {
+      console.log("Reactivando cliente ID:", id);
+      await reactivarCliente(id);
+      await fetchClientes(); // Recarga la lista
+
+      return { success: true };
+    } catch (err) {
+      const errorMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err.message ||
+        "Error desconocido";
+      setError(errorMsg);
+      console.error("Error al reactivar cliente:", err);
+      return { success: false, error: errorMsg };
+    } finally {
+      setLoadingReactivar(false);
+    }
+  };
+
   return {
     clientes,
     localidades,
@@ -189,9 +239,13 @@ export const useCliente = () => {
     loadingCreate,
     loadingUpdate,
     loadingDelete,
+    loadingBaja,
+    loadingReactivar,
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleBaja,
+    handleReactivar,
     refetch: fetchClientes,
   };
 };

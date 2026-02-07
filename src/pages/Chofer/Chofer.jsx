@@ -19,9 +19,13 @@ export const Chofer = () => {
     loadingCreate,
     loadingUpdate,
     loadingDelete,
+    loadingBaja,
+    loadingReactivar,
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleBaja,
+    handleReactivar,
     refetch,
   } = useChofer();
 
@@ -49,10 +53,11 @@ export const Chofer = () => {
 
   const handleCreateSubmit = async (data) => {
     const result = await handleCreate(data);
+    console.log("Create result:", result);
     if (result.success) {
       setIsCreateDialogOpen(false);
       toast.success('Chofer creado exitosamente', {
-        description: `${data.nombreCompleto} ha sido agregado al sistema.`
+        description: `${data.nombre} ${data.apellido} ha sido agregado al sistema.`
       });
     } else {
       toast.error('Error al crear chofer', {
@@ -65,11 +70,12 @@ export const Chofer = () => {
   const handleUpdateSubmit = async (data) => {
     if (!selectedChofer) return;
     const result = await handleUpdate(selectedChofer.idChofer || selectedChofer.id, data);
+    console.log("Update result:", result);
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedChofer(null);
       toast.success('Chofer actualizado exitosamente', {
-        description: `Los datos de ${data.nombreCompleto} han sido actualizados.`
+        description: `Los datos de ${data.nombre} ${data.apellido} han sido actualizados.`
       });
     } else {
       toast.error('Error al actualizar chofer', {
@@ -81,16 +87,30 @@ export const Chofer = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedChofer) return;
-    const result = await handleDelete(selectedChofer.idChofer || selectedChofer.id);
+    const result = await handleBaja(selectedChofer.idChofer || selectedChofer.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedChofer(null);
-      toast.success('Chofer eliminado exitosamente', {
-        description: `${selectedChofer.nombreCompleto} ha sido eliminado del sistema.`
+      toast.success('Chofer dado de baja exitosamente', {
+        description: `${selectedChofer.nombreCompleto} ha sido dado de baja del sistema.`
       });
     } else {
-      toast.error('Error al eliminar chofer', {
-        description: result.error || 'Ocurrió un error al intentar eliminar el chofer.'
+      toast.error('Error al dar de baja chofer', {
+        description: result.error || 'Ocurrió un error al intentar dar de baja el chofer.'
+      });
+    }
+  };
+
+  const handleReactivarChofer = async (chofer) => {
+    const result = await handleReactivar(chofer.idChofer || chofer.id);
+    if (result.success) {
+      setIsDetailDialogOpen(false);
+      toast.success('Chofer reactivado exitosamente', {
+        description: `${chofer.nombreCompleto} ha sido reactivado.`
+      });
+    } else {
+      toast.error('Error al reactivar chofer', {
+        description: result.error || 'Ocurrió un error al intentar reactivar el chofer.'
       });
     }
   };
@@ -140,6 +160,8 @@ export const Chofer = () => {
         open={isDetailDialogOpen}
         onOpenChange={setIsDetailDialogOpen}
         chofer={selectedChofer}
+        onReactivar={handleReactivarChofer}
+        loadingReactivar={loadingReactivar}
       />
 
       <ChoferForm
@@ -163,8 +185,10 @@ export const Chofer = () => {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar a ${selectedChofer?.nombreCompleto}? Esta acción no se puede deshacer.`}
+        isLoading={loadingBaja}
+        description={`¿Estás seguro de dar de baja a ${selectedChofer?.nombreCompleto}? Este chofer no podrá gestionar documentación hasta que sea reactivado.`}
+        title="Dar de Baja Chofer"
+        confirmText="Dar de Baja"
       />
     </div>
   );

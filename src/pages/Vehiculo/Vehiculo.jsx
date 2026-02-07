@@ -19,9 +19,13 @@ export const Vehiculo = () => {
     loadingCreate,
     loadingUpdate,
     loadingDelete,
+    loadingBaja,
+    loadingReactivar,
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleBaja,
+    handleReactivar,
     refetch,
   } = useVehiculo();
 
@@ -85,16 +89,30 @@ export const Vehiculo = () => {
 
   const handleDeleteConfirm = async () => {
     if (!selectedVehiculo) return;
-    const result = await handleDelete(selectedVehiculo.idVehiculo || selectedVehiculo.id);
+    const result = await handleBaja(selectedVehiculo.idVehiculo || selectedVehiculo.id);
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedVehiculo(null);
-      toast.success('Vehículo eliminado exitosamente', {
-        description: `El vehículo ${selectedVehiculo.patente} ha sido eliminado del sistema.`
+      toast.success('Vehículo dado de baja exitosamente', {
+        description: `El vehículo ${selectedVehiculo.patente} ha sido dado de baja del sistema.`
       });
     } else {
-      toast.error('Error al eliminar vehículo', {
-        description: result.error || 'Ocurrió un error al intentar eliminar el vehículo.'
+      toast.error('Error al dar de baja vehículo', {
+        description: result.error || 'Ocurrió un error al intentar dar de baja el vehículo.'
+      });
+    }
+  };
+
+  const handleReactivarVehiculo = async (vehiculo) => {
+    const result = await handleReactivar(vehiculo.idVehiculo || vehiculo.id);
+    if (result.success) {
+      setIsDetailDialogOpen(false);
+      toast.success('Vehículo reactivado exitosamente', {
+        description: `El vehículo ${vehiculo.patente} ha sido reactivado.`
+      });
+    } else {
+      toast.error('Error al reactivar vehículo', {
+        description: result.error || 'Ocurrió un error al intentar reactivar el vehículo.'
       });
     }
   };
@@ -165,14 +183,18 @@ export const Vehiculo = () => {
         open={isDetailDialogOpen}
         onOpenChange={setIsDetailDialogOpen}
         vehiculo={selectedVehiculo}
+        onReactivar={handleReactivarVehiculo}
+        loadingReactivar={loadingReactivar}
       />
 
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        isLoading={loadingDelete}
-        description={`¿Estás seguro de eliminar el vehículo ${selectedVehiculo?.patente}? Esta acción no se puede deshacer.`}
+        isLoading={loadingBaja}
+        description={`¿Estás seguro de dar de baja el vehículo ${selectedVehiculo?.patente}? Este vehículo no podrá gestionar documentación hasta que sea reactivado.`}
+        title="Dar de Baja Vehículo"
+        confirmText="Dar de Baja"
       />
     </div>
   );
