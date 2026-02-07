@@ -105,7 +105,7 @@ export const UsuarioForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoa
                 <FormItem>
                   <FormLabel>Usuario</FormLabel>
                   <FormControl>
-                    <Input placeholder="axel123" {...field} />
+                    <Input placeholder="juan123" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
