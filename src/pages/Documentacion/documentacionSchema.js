@@ -15,8 +15,11 @@ export const getDocumentacionSchema = (tipoEntidad) => {
         message: `Debe seleccionar un tipo válido: ${tiposValidos.join(', ')}`,
       }),
     detalle: z
-      .string()
-      .min(1, { message: 'El detalle es obligatorio' }),
+      .any()
+      .refine(
+        (file) => file instanceof File || file === null,
+        'Debe adjuntar un archivo válido'
+      ),
     renovacion: z.coerce
       .number({ invalid_type_error: 'Debe ingresar un número' })
       .int({ message: 'La renovación debe ser un número entero' })

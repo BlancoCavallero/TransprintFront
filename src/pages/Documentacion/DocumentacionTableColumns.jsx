@@ -74,6 +74,29 @@ export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
     },
   },
   {
+    id: 'archivo',
+    header: 'Archivo',
+    cell: ({ row }) => {
+      const detalle = row.original.detalle;
+
+      if (!detalle) {
+        return <span className="text-gray-400 text-sm">—</span>;
+      }
+
+      return (
+        <a
+          href={detalle}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline text-sm"
+        >
+          Ver
+        </a>
+      );
+    },
+  },
+
+  {
     id: 'acciones',
     header: 'Acciones',
     cell: ({ row }) => {

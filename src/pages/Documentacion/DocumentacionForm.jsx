@@ -46,7 +46,7 @@ export const DocumentacionForm = ({
     resolver: zodResolver(schema),
     defaultValues: {
       nombre: '',
-      detalle: '',
+      detalle: null, 
       renovacion: '',
       fechaVencimiento: '',
       ...defaultValues,
@@ -54,43 +54,57 @@ export const DocumentacionForm = ({
   });
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
       if (mode === 'create') {
         form.reset({
           nombre: '',
-          detalle: '',
+          detalle: null,
           renovacion: '',
           fechaVencimiento: '',
         });
-      } else if (defaultValues) {
-        form.reset({
-          nombre: defaultValues.nombre || '',
-          detalle: defaultValues.detalle || '',
-          renovacion: defaultValues.renovacion || '',
-          fechaVencimiento: defaultValues.fechaVencimiento
-            ? new Date(defaultValues.fechaVencimiento.split('/').reverse().join('-'))
-                .toISOString()
-                .split('T')[0]
-            : '',
-        });
       }
-    }
-  }, [open, mode, defaultValues, form]);
+
+{mode === 'edit' && defaultValues?.detalle && (
+  <a
+    href={defaultValues.detalle}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-sm text-blue-600 underline"
+  >
+    Ver documento actual
+  </a>
+)}
+    }, [open, mode, defaultValues, form]);
 
   const handleSubmit = async (data) => {
-    // Añadir el ID de la entidad y el tipo de entidad
-    const payload = {
-      ...data,
-      tipoEntidad,
-    };
+    
+      if (mode === 'create' && !data.detalle) {
+    form.setError('detalle', {
+      type: 'manual',
+      message: 'Debe adjuntar un archivo',
+    });
+    return;
+  }
+    const formData = new FormData();
+
+    formData.append("nombre", data.nombre);
+    formData.append("renovacion", data.renovacion);
+    formData.append("fechaVencimiento", data.fechaVencimiento);
+    formData.append("tipoEntidad", tipoEntidad);
+
 
     if (tipoEntidad === 'CHOFER') {
-      payload.idChofer = idEntidad;
-    } else if (tipoEntidad === 'VEHICULO') {
-      payload.idVehiculo = idEntidad;
+      formData.append("idChofer", idEntidad);
+    } else {
+      formData.append("idVehiculo", idEntidad);
     }
 
-    const result = await onSubmit(payload);
+    // 👇 SOLO si hay archivo nuevo
+    if (data.detalle instanceof File) {
+      formData.append("detalle", data.detalle);
+    }
+
+    const result = await onSubmit(formData);
     if (result?.success) {
       form.reset();
     }
@@ -148,12 +162,23 @@ export const DocumentacionForm = ({
                 <FormItem>
                   <FormLabel>Detalle *</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Link, imagen o archivo"
+                    <Input
+                      type="file"
+                      accept="image/*,application/pdf"
                       disabled={isLoading}
-                      {...field}
+                      onChange={(e) => field.onChange(e.target.files?.[0] || null)}
                     />
                   </FormControl>
+                  {mode === 'edit' && defaultValues?.detalle && (
+                    <a
+                      href={defaultValues.detalle}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 underline mt-1 inline-block"
+                    >
+                      Ver documento actual
+                    </a>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
