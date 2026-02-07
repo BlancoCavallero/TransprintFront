@@ -5,7 +5,8 @@ export function DashboardCards({
   clients,
   vehiclesAvailable,
   totalVehicles,
-  drivers,
+  driversAvailable,
+  totalDrivers,
   tripsInProgress,
 }) {
   const cards = [
@@ -22,9 +23,9 @@ export function DashboardCards({
       icon: <Car className="w-5 h-5 text-muted-foreground" />,
     },
     {
-      title: "Choferes Activos",
-      value: drivers,
-      subtitle: "Choferes disponibles",
+      title: "Choferes Disponibles",
+      value: `${driversAvailable}/${totalDrivers}`,
+      subtitle: "Choferes listos para viajes",
       icon: <UserCheck className="w-5 h-5 text-muted-foreground" />,
     },
     {

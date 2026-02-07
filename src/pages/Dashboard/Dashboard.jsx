@@ -41,7 +41,8 @@ export function Dashboard() {
         clients={data.clients}
         vehiclesAvailable={data.vehiclesAvailable}
         totalVehicles={data.totalVehicles}
-        drivers={data.drivers}
+        driversAvailable={data.driversAvailable}
+        totalDrivers={data.totalDrivers}
         tripsInProgress={data.tripsInProgress}
       />
 

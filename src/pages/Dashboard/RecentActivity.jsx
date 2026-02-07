@@ -4,7 +4,7 @@ export function RecentActivity({ activities }) {
   return (
     <Card className="flex-1">
       <CardHeader>
-        <CardTitle>Actividad Reciente</CardTitle>
+        <CardTitle>Mantenimientos</CardTitle>
         <p className="text-sm text-muted-foreground">Últimas actividades del sistema</p>
       </CardHeader>
       <CardContent className="space-y-3">
