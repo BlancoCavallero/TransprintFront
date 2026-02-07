@@ -58,9 +58,9 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
 
   const getEstadoColor = (estado) => {
     if (!estado) return 'bg-gray-100 text-gray-700';
-    if (estado === 'Disponible') return 'bg-green-100 text-green-700';
-    if (estado === 'Inhabilitado') return 'bg-red-100 text-red-700';
-    if (estado === 'En viaje') return 'bg-blue-100 text-blue-700';
+    if (estado === 'HABILITADO') return 'bg-green-100 text-green-700';
+    if (estado === 'INHABILITADO') return 'bg-red-100 text-red-700';
+    if (estado === 'OCUPADO') return 'bg-blue-100 text-blue-700';
     return 'bg-gray-100 text-gray-700';
   };
 

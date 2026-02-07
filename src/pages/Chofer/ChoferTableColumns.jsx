@@ -60,13 +60,13 @@ export const createChoferColumns = (onEdit, onDelete, onView) => [
       const estado = row.original.estadoDisponibilidad;
       return (
         <div className="flex items-center gap-2">
-          {estado === 'Disponible' && <AlertCircle className="h-4 w-4 text-green-500" />}
-          {estado === 'Inhabilitado' && <AlertCircle className="h-4 w-4 text-red-500" />}
-          {estado === 'En viaje' && <Truck className="h-4 w-4 text-blue-500" />}
+          {estado === 'HABILITADO' && <AlertCircle className="h-4 w-4 text-green-500" />}
+          {estado === 'INHABILITADO' && <AlertCircle className="h-4 w-4 text-red-500" />}
+          {estado === 'OCUPADO' && <Truck className="h-4 w-4 text-blue-500" />}
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            estado === 'Disponible' 
+            estado === 'HABILITADO' 
               ? 'bg-green-100 text-green-700' 
-              : estado === 'En viaje'
+              : estado === 'OCUPADO'
               ? 'bg-blue-100 text-blue-700'
               : 'bg-red-100 text-red-700'
           }`}>

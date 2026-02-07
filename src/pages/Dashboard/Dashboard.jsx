@@ -16,6 +16,7 @@ export function Dashboard() {
       try {
         const response = await getDashboard();
         setData(mapDashboard(response.data));
+        console.log("Dashboard data:", response.data);
       } catch (error) {
         console.error("Error al cargar dashboard:", error);
       } finally {

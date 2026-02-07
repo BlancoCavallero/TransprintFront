@@ -35,7 +35,7 @@ const extractVehiculos = (response) => {
   return list.map(normalizeVehiculo);
 };
 
-export const useVehiculo = () => {
+export const useVehiculo = (params = {}) => {
   const [vehiculos, setVehiculos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -47,7 +47,7 @@ export const useVehiculo = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getVehiculo();
+      const response = await getVehiculo(params);
       setVehiculos(extractVehiculos(response));
     } catch (err) {
       setError(err.message || "Error desconocido");
@@ -55,7 +55,7 @@ export const useVehiculo = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [JSON.stringify(params)]);
 
   useEffect(() => {
     fetchVehiculos();
@@ -66,7 +66,7 @@ export const useVehiculo = () => {
     setError(null);
 
     try {
-      console.log("Creating vehiculo with data:", data);
+      console.log("Enviando la data de los vehiculos", data);
 
       await postVehiculo(data);
       await fetchVehiculos(); // Recarga la lista completa

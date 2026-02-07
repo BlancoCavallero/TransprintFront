@@ -6,8 +6,8 @@ import {
 } from "./genericService";
 
 // Obtener todos los choferes
-export const getChofer = async () => {
-  return await getGeneric("/drivers");
+export const getChofer = async (params = {}) => {
+  return await getGeneric("/drivers", params);
 };
 
 // Registrar chofer

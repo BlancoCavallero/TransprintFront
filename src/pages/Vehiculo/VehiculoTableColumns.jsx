@@ -27,7 +27,7 @@ export const createVehiculoColumns = (onEdit, onDelete, onView) => [
     },
   },
   {
-    accessorKey: 'estado',
+    accessorKey: 'estadoDisponibilidad',
     header: ({ column }) => {
       return (
         <Button
@@ -40,15 +40,14 @@ export const createVehiculoColumns = (onEdit, onDelete, onView) => [
       );
     },
     cell: ({ row }) => {
-      const estado = row.original.estado;
-      const estadoLower = estado?.toLowerCase() || '';
+      const estado = row.original.estadoDisponibilidad;
       return (
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-gray-500" />
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            estadoLower === 'activo' 
+            estado  === 'HABILITADO' 
               ? 'bg-green-100 text-green-700' 
-              : estadoLower === 'en mantenimiento'
+              : estado === 'EN_MANTENIMIENTO'
               ? 'bg-yellow-100 text-yellow-700'
               : 'bg-red-100 text-red-700'
           }`}>

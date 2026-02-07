@@ -46,7 +46,7 @@ export const VehiculoForm = ({
       marca: '',
       modelo: '',
       anio: '',
-      estado: 'Activo',
+      // estado: 'Activo',
       tipo: '',
     },
   });
@@ -67,7 +67,7 @@ export const VehiculoForm = ({
         marca: defaultValues.marca || '',
         modelo: defaultValues.modelo || '',
         anio: defaultValues.anio?.toString() || '',
-        estado: defaultValues.estado || 'Activo',
+        // estado: defaultValues.estado || 'Activo',
         tipo: normalizeTipo(defaultValues.tipo),
       });
     } else if (open && mode === 'create') {
@@ -76,7 +76,7 @@ export const VehiculoForm = ({
         marca: '',
         modelo: '',
         anio: '',
-        estado: 'Activo',
+        // estado: 'Activo',
         tipo: '',
       });
     }
@@ -181,7 +181,7 @@ export const VehiculoForm = ({
             />
 
             {/* TODO: Eliminar este campo cuando el backend implemente el estado automático */}
-            <FormField
+            {/* <FormField
               control={form.control}
               name="estado"
               render={({ field }) => (
@@ -202,7 +202,7 @@ export const VehiculoForm = ({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <DialogFooter>
               <Button

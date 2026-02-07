@@ -1,27 +1,27 @@
 import { z } from "zod";
 
 const viajeBaseSchema = z.object({
-  idChofer: z
+  idChofer: z.coerce
     .number({ invalid_type_error: "Debe seleccionar un chofer" })
     .int("Debe seleccionar un chofer válido")
     .positive("Debe seleccionar un chofer válido"),
 
-  idVehiculo: z
+  idVehiculo: z.coerce
     .number({ invalid_type_error: "Debe seleccionar un vehículo" })
     .int("Debe seleccionar un vehículo válido")
     .positive("Debe seleccionar un vehículo válido"),
 
-  idCliente: z
+  idCliente: z.coerce
     .number({ invalid_type_error: "Debe seleccionar un cliente" })
     .int("Debe seleccionar un cliente válido")
     .positive("Debe seleccionar un cliente válido"),
 
-  idLocalidadOrigen: z
+  idLocalidadOrigen: z.coerce
     .number({ invalid_type_error: "Debe seleccionar una localidad de origen" })
     .int("Debe seleccionar una localidad de origen válida")
     .positive("Debe seleccionar una localidad de origen válida"),
 
-  idLocalidadDestino: z
+  idLocalidadDestino: z.coerce
     .number({ invalid_type_error: "Debe seleccionar una localidad de destino" })
     .int("Debe seleccionar una localidad de destino válida")
     .positive("Debe seleccionar una localidad de destino válida"),
@@ -36,12 +36,12 @@ const viajeBaseSchema = z.object({
     .min(1, "La fecha de fin es requerida")
     .regex(/^\d{4}-\d{2}-\d{2}$/, "El formato de fecha debe ser YYYY-MM-DD"),
 
-  kilometros: z
+  kilometros: z.coerce
     .number({ invalid_type_error: "Los kilómetros deben ser un número" })
     .nonnegative("Los kilómetros no pueden ser negativos")
     .min(0, "Los kilómetros deben ser mayor o igual a 0"),
 
-  precio: z
+  precio: z.coerce
     .number({ invalid_type_error: "El precio debe ser un número" })
     .positive("El precio debe ser mayor a 0"),
 
@@ -72,31 +72,31 @@ const viajeBaseSchema = z.object({
 
 // Schema para edición que incluye estado y motivoCancelacion
 const editViajeSchema = z.object({
-  idChofer: z
+  idChofer: z.coerce
     .number({ invalid_type_error: "Debe seleccionar un chofer" })
     .int("Debe seleccionar un chofer válido")
     .positive("Debe seleccionar un chofer válido")
     .optional(),
 
-  idVehiculo: z
+  idVehiculo: z.coerce
     .number({ invalid_type_error: "Debe seleccionar un vehículo" })
     .int("Debe seleccionar un vehículo válido")
     .positive("Debe seleccionar un vehículo válido")
     .optional(),
 
-  idCliente: z
+  idCliente: z.coerce
     .number({ invalid_type_error: "Debe seleccionar un cliente" })
     .int("Debe seleccionar un cliente válido")
     .positive("Debe seleccionar un cliente válido")
     .optional(),
 
-  idLocalidadOrigen: z
+  idLocalidadOrigen: z.coerce
     .number({ invalid_type_error: "Debe seleccionar una localidad de origen" })
     .int("Debe seleccionar una localidad de origen válida")
     .positive("Debe seleccionar una localidad de origen válida")
     .optional(),
 
-  idLocalidadDestino: z
+  idLocalidadDestino: z.coerce
     .number({ invalid_type_error: "Debe seleccionar una localidad de destino" })
     .int("Debe seleccionar una localidad de destino válida")
     .positive("Debe seleccionar una localidad de destino válida")
@@ -114,13 +114,13 @@ const editViajeSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, "El formato de fecha debe ser YYYY-MM-DD")
     .optional(),
 
-  kilometros: z
+  kilometros: z.coerce
     .number({ invalid_type_error: "Los kilómetros deben ser un número" })
     .nonnegative("Los kilómetros no pueden ser negativos")
     .min(0, "Los kilómetros deben ser mayor o igual a 0")
     .optional(),
 
-  precio: z
+  precio: z.coerce
     .number({ invalid_type_error: "El precio debe ser un número" })
     .positive("El precio debe ser mayor a 0")
     .optional(),

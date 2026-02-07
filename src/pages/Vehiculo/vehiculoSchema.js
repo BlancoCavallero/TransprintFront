@@ -27,9 +27,9 @@ const vehiculoBaseSchema = z.object({
     }, "El año debe estar entre 1900 y el año actual"),
 
   // TODO: Eliminar este campo cuando el backend implemente el estado automático
-  estado: z.enum(["Activo", "Inactivo", "En mantenimiento"], {
-    errorMap: () => ({ message: "Debe seleccionar un estado válido" }),
-  }),
+  // estado: z.enum(["Activo", "Inactivo", "En mantenimiento"], {
+  //   errorMap: () => ({ message: "Debe seleccionar un estado válido" }),
+  // }),
 
   tipo: z.enum(["Camion", "Acoplado"], {
     errorMap: () => ({

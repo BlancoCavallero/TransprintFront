@@ -5,8 +5,8 @@ import {
   deleteGeneric,
 } from "./genericService";
 
-export const getVehiculo = async () => {
-  return await getGeneric("/vehiculos");
+export const getVehiculo = async (params = {}) => {
+  return await getGeneric("/vehiculos", params);
 };
 
 // Registrar vehiculo

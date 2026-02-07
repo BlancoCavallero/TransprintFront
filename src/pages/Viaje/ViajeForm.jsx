@@ -36,8 +36,8 @@ import { useLocalidad } from '../../hooks/entities/useLocalidad';
 
 export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoading = false, mode = 'create' }) => {
   const schema = getViajeSchema(mode);
-  const { choferes, loading: loadingChoferes } = useChofer();
-  const { vehiculos, loading: loadingVehiculos } = useVehiculo();
+  const { choferes, loading: loadingChoferes } = useChofer({ estado: 'Habilitado' });
+  const { vehiculos, loading: loadingVehiculos } = useVehiculo({ estado: 'Habilitado' });
   const { clientes, loading: loadingClientes } = useCliente();
   const { localidades, loading: loadingLocalidades } = useLocalidad();
 
@@ -51,8 +51,8 @@ export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoadi
       idLocalidadDestino: '',
       fechaInicio: '',
       fechaFin: '',
-      kilometros: 0,
-      precio: 0,
+      kilometros: '',
+      precio: '',
       observaciones: '',
       estado: '',
       motivoCancelacion: '',
@@ -72,8 +72,8 @@ export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoadi
         idLocalidadDestino: defaultValues.idLocalidadDestino || '',
         fechaInicio: defaultValues.fechaInicio?.split('T')[0] || '',
         fechaFin: defaultValues.fechaFin?.split('T')[0] || '',
-        kilometros: defaultValues.kilometros || 0,
-        precio: defaultValues.precio || 0,
+        kilometros: defaultValues.kilometros || '',
+        precio: defaultValues.precio || '',
         observaciones: defaultValues.observaciones || '',
         estado: '',
         motivoCancelacion: defaultValues.motivoCancelacion || '',
@@ -87,8 +87,8 @@ export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoadi
         idLocalidadDestino: '',
         fechaInicio: '',
         fechaFin: '',
-        kilometros: 0,
-        precio: 0,
+        kilometros: '',
+        precio: '',
         observaciones: '',
         estado: '',
         motivoCancelacion: '',
@@ -97,16 +97,8 @@ export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoadi
   }, [open, defaultValues, mode, form]);
 
   const handleSubmit = async (data) => {
-    const payload = {
-      ...data,
-      idChofer: parseInt(data.idChofer, 10),
-      idVehiculo: parseInt(data.idVehiculo, 10),
-      idCliente: parseInt(data.idCliente, 10),
-      idLocalidadOrigen: parseInt(data.idLocalidadOrigen, 10),
-      idLocalidadDestino: parseInt(data.idLocalidadDestino, 10),
-      kilometros: parseFloat(data.kilometros),
-      precio: parseFloat(data.precio),
-    };
+    // z.coerce ya convierte los strings a números, no necesitamos hacerlo manualmente
+    const payload = { ...data };
 
     if (mode === 'edit' && !data.estado) {
       delete payload.estado;
@@ -338,7 +330,6 @@ export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoadi
                         type="number" 
                         placeholder="0" 
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -357,7 +348,6 @@ export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoadi
                         type="number" 
                         placeholder="0" 
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
                     </FormControl>
                     <FormMessage />

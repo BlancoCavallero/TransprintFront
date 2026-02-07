@@ -48,7 +48,7 @@ const extractChoferes = (response) => {
   return [];
 };
 
-export const useChofer = () => {
+export const useChofer = (params = {}) => {
   const [choferes, setChoferes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -60,7 +60,7 @@ export const useChofer = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getChofer();
+      const response = await getChofer(params);
       setChoferes(extractChoferes(response));
     } catch (err) {
       const errorMsg =
@@ -73,7 +73,7 @@ export const useChofer = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [JSON.stringify(params)]);
 
   useEffect(() => {
     fetchChoferes();
