@@ -17,14 +17,18 @@ import { DocumentacionDetailDialog } from '../Documentacion/DocumentacionDetailD
 import { createDocumentacionColumns } from '../Documentacion/DocumentacionTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { toast } from 'sonner';
+import { AlertCircle } from 'lucide-react';
 
-export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
+export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo, onReactivar, loadingReactivar }) => {
   const [activeTab, setActiveTab] = useState('detalles');
   const [isCreateDocOpen, setIsCreateDocOpen] = useState(false);
   const [isEditDocOpen, setIsEditDocOpen] = useState(false);
   const [isDeleteDocOpen, setIsDeleteDocOpen] = useState(false);
   const [isDetailDocOpen, setIsDetailDocOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState(null);
+
+  // Verificar si el vehículo está de baja
+  const estaDeBaja = vehiculo?.estadoDisponibilidad === 'DE_BAJA';
 
   const {
     documentaciones,
@@ -53,6 +57,7 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
     if (estadoLower === 'activo') return 'bg-green-100 text-green-700';
     if (estadoLower === 'inactivo') return 'bg-red-100 text-red-700';
     if (estadoLower === 'en mantenimiento') return 'bg-yellow-100 text-yellow-700';
+    if (estado === 'DE_BAJA') return 'bg-orange-100 text-orange-700';
     return 'bg-gray-100 text-gray-700';
   };
 
@@ -92,7 +97,7 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
     if (result.success) {
       setIsCreateDocOpen(false);
       toast.success('Documentación registrada exitosamente', {
-        description: `La documentación de tipo "${data.tipo}" ha sido agregada al vehículo.`
+        description: `La documentación de tipo "${data.nombre}" ha sido agregada al vehículo.`
       });
     } else {
       toast.error('Error al registrar documentación', {
@@ -238,22 +243,40 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo }) => {
         </TabsContent>
 
         <TabsContent value="documentacion" className="space-y-4 mt-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">
-              Documentación del Vehículo ({documentaciones.length})
-            </h3>
-            <Button onClick={() => setIsCreateDocOpen(true)} size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Registrar Documentación
-            </Button>
-          </div>
-
-          {loadingDocs ? (
-            <div className="flex items-center justify-center h-32">
-              <p className="text-sm text-gray-500">Cargando documentación...</p>
+          {estaDeBaja ? (
+            <div className="flex flex-col items-center justify-center h-64 space-y-4">
+              <AlertCircle className="h-16 w-16 text-orange-500" />
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-semibold text-gray-900">Vehículo de Baja</h3>
+                <p className="text-sm text-gray-500 max-w-md">
+                  Este vehículo está dado de baja. No se puede gestionar documentación hasta que sea reactivado.
+                </p>
+              </div>
+              <Button onClick={() => onReactivar?.(vehiculo)} disabled={loadingReactivar} size="lg">
+                <Plus className="mr-2 h-4 w-4" />
+                {loadingReactivar ? 'Reactivando...' : 'Reactivar Vehículo'}
+              </Button>
             </div>
           ) : (
-            <DocumentacionTable columns={docsColumns} data={documentaciones} />
+            <>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Documentación del Vehículo ({documentaciones.length})
+                </h3>
+                <Button onClick={() => setIsCreateDocOpen(true)} size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Registrar Documentación
+                </Button>
+              </div>
+
+              {loadingDocs ? (
+                <div className="flex items-center justify-center h-32">
+                  <p className="text-sm text-gray-500">Cargando documentación...</p>
+                </div>
+              ) : (
+                <DocumentacionTable columns={docsColumns} data={documentaciones} />
+              )}
+            </>
           )}
         </TabsContent>
       </Tabs>

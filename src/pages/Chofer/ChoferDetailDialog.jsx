@@ -18,13 +18,16 @@ import { createDocumentacionColumns } from '../Documentacion/DocumentacionTableC
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { toast } from 'sonner';
 
-export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
+export const ChoferDetailDialog = ({ open, onOpenChange, chofer, onReactivar, loadingReactivar }) => {
   const [activeTab, setActiveTab] = useState('detalles');
   const [isCreateDocOpen, setIsCreateDocOpen] = useState(false);
   const [isEditDocOpen, setIsEditDocOpen] = useState(false);
   const [isDeleteDocOpen, setIsDeleteDocOpen] = useState(false);
   const [isDetailDocOpen, setIsDetailDocOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState(null);
+
+  // Verificar si el chofer está de baja
+  const estaDeBaja = chofer?.estadoDisponibilidad === 'DE_BAJA';
 
   const {
     documentaciones,
@@ -58,9 +61,10 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
 
   const getEstadoColor = (estado) => {
     if (!estado) return 'bg-gray-100 text-gray-700';
-    if (estado === 'HABILITADO') return 'bg-green-100 text-green-700';
-    if (estado === 'INHABILITADO') return 'bg-red-100 text-red-700';
-    if (estado === 'OCUPADO') return 'bg-blue-100 text-blue-700';
+    if (estado === 'HABILITADO' || estado === 'Disponible') return 'bg-green-100 text-green-700';
+    if (estado === 'INHABILITADO' || estado === 'Inhabilitado') return 'bg-red-100 text-red-700';
+    if (estado === 'OCUPADO' || estado === 'En viaje') return 'bg-blue-100 text-blue-700';
+    if (estado === 'DE_BAJA') return 'bg-orange-100 text-orange-700';
     return 'bg-gray-100 text-gray-700';
   };
 
@@ -84,7 +88,7 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
     if (result.success) {
       setIsCreateDocOpen(false);
       toast.success('Documentación registrada exitosamente', {
-        description: `La documentación de tipo "${data.tipo}" ha sido agregada al chofer.`
+        description: `La documentación de tipo "${data.nombre}" ha sido agregada al chofer.`
       });
     } else {
       toast.error('Error al registrar documentación', {
@@ -247,22 +251,40 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer }) => {
         </TabsContent>
 
         <TabsContent value="documentacion" className="space-y-4 mt-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">
-              Documentación del Chofer ({documentaciones.length})
-            </h3>
-            <Button onClick={() => setIsCreateDocOpen(true)} size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Registrar Documentación
-            </Button>
-          </div>
-
-          {loadingDocs ? (
-            <div className="flex items-center justify-center h-32">
-              <p className="text-sm text-gray-500">Cargando documentación...</p>
+          {estaDeBaja ? (
+            <div className="flex flex-col items-center justify-center h-64 space-y-4">
+              <AlertCircle className="h-16 w-16 text-orange-500" />
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-semibold text-gray-900">Chofer de Baja</h3>
+                <p className="text-sm text-gray-500 max-w-md">
+                  Este chofer está dado de baja. No se puede gestionar documentación hasta que sea reactivado.
+                </p>
+              </div>
+              <Button onClick={() => onReactivar?.(chofer)} disabled={loadingReactivar} size="lg">
+                <Plus className="mr-2 h-4 w-4" />
+                {loadingReactivar ? 'Reactivando...' : 'Reactivar Chofer'}
+              </Button>
             </div>
           ) : (
-            <DocumentacionTable columns={docsColumns} data={documentaciones} />
+            <>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Documentación del Chofer ({documentaciones.length})
+                </h3>
+                <Button onClick={() => setIsCreateDocOpen(true)} size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Registrar Documentación
+                </Button>
+              </div>
+
+              {loadingDocs ? (
+                <div className="flex items-center justify-center h-32">
+                  <p className="text-sm text-gray-500">Cargando documentación...</p>
+                </div>
+              ) : (
+                <DocumentacionTable columns={docsColumns} data={documentaciones} />
+              )}
+            </>
           )}
         </TabsContent>
       </Tabs>

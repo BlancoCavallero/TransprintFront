@@ -5,10 +5,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Mail, Phone, Building, MapPin, User, FileText, Hash } from 'lucide-react';
+import { Mail, Phone, Building, MapPin, User, FileText, Hash, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-export const ClienteDetailDialog = ({ open, onOpenChange, cliente }) => {
+export const ClienteDetailDialog = ({ open, onOpenChange, cliente, onReactivar, loadingReactivar }) => {
   if (!cliente) return null;
+
+  const estaDeBaja = cliente.estado === 'DE_BAJA';
+
+  const getEstadoColor = (estado) => {
+    switch (estado) {
+      case 'Activo':
+      case 'ACTIVO':
+        return 'bg-green-100 text-green-700';
+      case 'DE_BAJA':
+        return 'bg-orange-100 text-orange-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
 
   const formatCuit = (cuit) => {
     if (!cuit) return 'No especificado';
@@ -31,6 +46,38 @@ export const ClienteDetailDialog = ({ open, onOpenChange, cliente }) => {
             Información completa del cliente
           </DialogDescription>
         </DialogHeader>
+
+        {/* Estado Badge */}
+        {cliente.estado && (
+          <div className="flex justify-start">
+            <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${ getEstadoColor(cliente.estado)}`}>
+              {cliente.estado}
+            </span>
+          </div>
+        )}
+
+        {/* Alerta de Cliente de Baja */}
+        {estaDeBaja && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-semibold text-orange-900">Cliente dado de baja</h4>
+              <p className="text-sm text-orange-700 mt-1">
+                Este cliente está dado de baja. Para poder realizar operaciones con este cliente, debe reactivarlo primero.
+              </p>
+              {onReactivar && (
+                <Button
+                  onClick={() => onReactivar(cliente)}
+                  disabled={loadingReactivar}
+                  className="mt-3 bg-orange-600 hover:bg-orange-700 text-white"
+                  size="sm"
+                >
+                  {loadingReactivar ? 'Reactivando...' : 'Reactivar Cliente'}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6 mt-4">
           {/* Información Personal */}
