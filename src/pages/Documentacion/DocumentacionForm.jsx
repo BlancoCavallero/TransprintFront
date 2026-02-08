@@ -127,14 +127,6 @@ export const DocumentacionForm = ({
 
     if (tipoEntidad === 'CHOFER') {
       formData.append("idChofer", idEntidad);
-    } else {
-      formData.append("idVehiculo", idEntidad);
-    }
-
-    // 👇 SOLO si hay archivo nuevo
-    if (data.detalle instanceof File) {
-      formData.append("detalle", data.detalle);
-      formData.append('idChofer', idEntidad);
     } else if (tipoEntidad === 'VEHICULO') {
       formData.append('idVehiculo', idEntidad);
     }
