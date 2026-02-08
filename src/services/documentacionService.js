@@ -10,14 +10,22 @@ export const getDocumentacion = async () => {
   return await getGeneric("/documentations");
 };
 
-// Registrar documentación
-export const postDocumentacion = async (data) => {
-  return await postGeneric("/documentations", data);
+// Registrar documentación con archivo PDF
+export const postDocumentacion = async (formData) => {
+  // FormData requiere headers multipart/form-data
+  // Axios lo establece automáticamente cuando detecta FormData
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+  };
+  return await postGeneric("/documentations", formData, headers);
 };
 
-// Actualizar documentación
-export const putDocumentacion = async (id, data) => {
-  return await putGeneric(`/documentations/${id}`, data);
+// Actualizar documentación (puede o no incluir nuevo archivo)
+export const putDocumentacion = async (id, formData) => {
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+  };
+  return await putGeneric(`/documentations/${id}`, formData, headers);
 };
 
 // Eliminar documentación

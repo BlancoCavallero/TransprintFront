@@ -4,19 +4,20 @@ import { z } from 'zod';
 export const TIPOS_DOC_CHOFER = ['APTO FISICO', 'CARNET DE CONDUCIR', 'OTRO'];
 export const TIPOS_DOC_VEHICULO = ['VTV', 'SEGURO', 'OTRO'];
 
-export const getDocumentacionSchema = (tipoEntidad) => {
+// Validación de archivo PDF
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_FILE_TYPE = 'application/pdf';
+
+export const getDocumentacionSchema = (tipoEntidad, mode = 'create') => {
   const tiposValidos = tipoEntidad === 'CHOFER' ? TIPOS_DOC_CHOFER : TIPOS_DOC_VEHICULO;
   
-  return z.object({
+  const baseSchema = {
     nombre: z
       .string()
       .min(1, { message: 'El tipo de documentación es obligatorio' })
       .refine((val) => tiposValidos.includes(val), {
         message: `Debe seleccionar un tipo válido: ${tiposValidos.join(', ')}`,
       }),
-    detalle: z
-      .string()
-      .min(1, { message: 'El detalle es obligatorio' }),
     renovacion: z.coerce
       .number({ invalid_type_error: 'Debe ingresar un número' })
       .int({ message: 'La renovación debe ser un número entero' })
@@ -32,5 +33,35 @@ export const getDocumentacionSchema = (tipoEntidad) => {
       }, {
         message: 'Formato de fecha inválido',
       }),
+  };
+
+  // Para crear: archivo es obligatorio
+  if (mode === 'create') {
+    return z.object({
+      ...baseSchema,
+      detalle: z
+        .instanceof(File, { message: 'Debe seleccionar un archivo PDF' })
+        .refine((file) => file.size <= MAX_FILE_SIZE, {
+          message: 'El archivo no debe superar los 5MB',
+        })
+        .refine((file) => file.type === ACCEPTED_FILE_TYPE, {
+          message: 'Solo se permiten archivos PDF',
+        }),
+    });
+  }
+
+  // Para editar: archivo es opcional (si no se selecciona, se mantiene el actual)
+  return z.object({
+    ...baseSchema,
+    detalle: z
+      .instanceof(File)
+      .refine((file) => file.size <= MAX_FILE_SIZE, {
+        message: 'El archivo no debe superar los 5MB',
+      })
+      .refine((file) => file.type === ACCEPTED_FILE_TYPE, {
+        message: 'Solo se permiten archivos PDF',
+      })
+      .optional()
+      .or(z.literal('')),
   });
 };
