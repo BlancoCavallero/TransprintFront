@@ -98,22 +98,22 @@ export const createGastoColumns = (onEdit, onDelete, onView) => [
       );
     },
   },
-  {
-    id: 'ruta',
-    header: 'Ruta',
-    cell: ({ row }) => {
-      const viaje = row.original.viaje;
-      const origen = viaje?.localidadOrigen?.localidad || `Loc. ${viaje?.idLocalidadOrigen}`;
-      const destino = viaje?.localidadDestino?.localidad || `Loc. ${viaje?.idLocalidadDestino}`;
+  // {
+  //   id: 'ruta',
+  //   header: 'Ruta',
+  //   cell: ({ row }) => {
+  //     const viaje = row.original.viaje;
+  //     const origen = viaje?.localidadOrigen?.localidad || `Loc. ${viaje?.idLocalidadOrigen}`;
+  //     const destino = viaje?.localidadDestino?.localidad || `Loc. ${viaje?.idLocalidadDestino}`;
       
-      return (
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-gray-500" />
-          <span className="text-sm">{origen} → {destino}</span>
-        </div>
-      );
-    },
-  },
+  //     return (
+  //       <div className="flex items-center gap-2">
+  //         <MapPin className="h-4 w-4 text-gray-500" />
+  //         <span className="text-sm">{origen} → {destino}</span>
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     id: 'acciones',
     header: 'Acciones',

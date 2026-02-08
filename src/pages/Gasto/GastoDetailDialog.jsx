@@ -108,7 +108,7 @@ export const GastoDetailDialog = ({ open, onOpenChange, gasto }) => {
                   <p className="text-xs text-gray-500">Kilómetros</p>
                   <p className="text-sm font-medium">{gasto.viaje.kilometros || 0} km</p>
                 </div>
-
+{/* 
                 <div className="space-y-1 col-span-2">
                   <p className="text-xs text-gray-500">Ruta</p>
                   <div className="flex items-center gap-2">
@@ -117,7 +117,7 @@ export const GastoDetailDialog = ({ open, onOpenChange, gasto }) => {
                       Origen (ID: {gasto.viaje.idLocalidadOrigen}) → Destino (ID: {gasto.viaje.idLocalidadDestino})
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 {gasto.viaje.chofer && (
                   <div className="space-y-1">
