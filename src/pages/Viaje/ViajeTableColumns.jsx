@@ -46,10 +46,8 @@ export const createViajeColumns = (onEdit, onDelete, onView) => [
     header: 'Ruta',
     cell: ({ row }) => {
       const viaje = row.original;
-      // Aquí usamos los datos de localidades que deberían estar cargados
-      // Por ahora mostramos un placeholder - se debe implementar la lógica para buscar el nombre
-      const origen = viaje.localidadOrigen?.localidad || `Loc. ${viaje.idLocalidadOrigen}`;
-      const destino = viaje.localidadDestino?.localidad || `Loc. ${viaje.idLocalidadDestino}`;
+      const origen = viaje.localidadOrigen?.nombre || `Loc. ${viaje.idLocalidadOrigen}`;
+      const destino = viaje.localidadDestino?.nombre || `Loc. ${viaje.idLocalidadDestino}`;
       
       return (
         <div className="flex items-center gap-2">
