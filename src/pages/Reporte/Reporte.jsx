@@ -1,14 +1,45 @@
+import { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BarChart } from "lucide-react";
+import { BarChart, Loader2 } from "lucide-react";
 import { ReportFilters } from "./ReportFilters";
 import { EarningsTab } from "./EarningsTab";
 import { ExpensesTab } from "./ExpensesTab";
 import { AllowancesTab } from "./AllowancesTab";
-import { mockReportsData } from "../../services/mock/mockReports";
+import { useReporte } from "../../hooks/entities/useReporte";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function Reporte() {
-  const { earnings, expenses, allowances } = mockReportsData;
+  const currentYear = new Date().getFullYear();
+  const [filtros, setFiltros] = useState({ mes: null, anio: currentYear });
+  const [activeTab, setActiveTab] = useState("earnings");
 
+  const {
+    reporteGanancias,
+    reporteGastos,
+    reporteViaticos,
+    loadingGanancias,
+    loadingGastos,
+    loadingViaticos,
+    errorGanancias,
+    errorGastos,
+    errorViaticos,
+    fetchReporteGanancias,
+    fetchReporteGastos,
+    fetchReporteViaticos,
+  } = useReporte();
+
+  // Cargar reporte inicial
+  useEffect(() => {    
+    fetchReporteGanancias(filtros);
+    fetchReporteGastos(filtros);
+    fetchReporteViaticos(filtros);
+  }, [filtros, fetchReporteGanancias, fetchReporteGastos, fetchReporteViaticos]);
+
+  const handleApplyFilters = (newFiltros) => {
+    console.log('\n🔄 [COMPONENTE-REPORTE] Aplicando nuevos filtros:', newFiltros);
+    setFiltros(newFiltros);
+  };
+  
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -18,9 +49,9 @@ export function Reporte() {
         </div>
       </div>
 
-      <ReportFilters />
+      <ReportFilters onApplyFilters={handleApplyFilters} initialFiltros={filtros} />
 
-      <Tabs defaultValue="earnings" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full sm:w-[400px]">
           <TabsTrigger value="earnings">Ganancias</TabsTrigger>
           <TabsTrigger value="expenses">Gastos</TabsTrigger>
@@ -28,15 +59,45 @@ export function Reporte() {
         </TabsList>
 
         <TabsContent value="earnings">
-          <EarningsTab data={earnings} />
+          {loadingGanancias ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : errorGanancias ? (
+            <Alert variant="destructive">
+              <AlertDescription>{errorGanancias}</AlertDescription>
+            </Alert>
+          ) : (
+            <EarningsTab data={reporteGanancias} filtros={filtros} />
+          )}
         </TabsContent>
 
         <TabsContent value="expenses">
-          <ExpensesTab data={expenses} />
+          {loadingGastos ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : errorGastos ? (
+            <Alert variant="destructive">
+              <AlertDescription>{errorGastos}</AlertDescription>
+            </Alert>
+          ) : (
+            <ExpensesTab data={reporteGastos} filtros={filtros} />
+          )}
         </TabsContent>
 
         <TabsContent value="allowances">
-          <AllowancesTab data={allowances} />
+          {loadingViaticos ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : errorViaticos ? (
+            <Alert variant="destructive">
+              <AlertDescription>{errorViaticos}</AlertDescription>
+            </Alert>
+          ) : (
+            <AllowancesTab data={reporteViaticos} filtros={filtros} />
+          )}
         </TabsContent>
       </Tabs>
     </div>
