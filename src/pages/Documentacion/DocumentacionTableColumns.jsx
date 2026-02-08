@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Eye, Edit, Trash2, FileText, Calendar, Activity, ExternalLink } from 'lucide-react';
 import { ArrowUpDown } from 'lucide-react';
+import { backend_url } from '@/configuration/app.config';
 
 export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
   {
@@ -86,7 +87,9 @@ export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
       }
 
       const handleViewPDF = () => {
-        window.open(detalle, '_blank');
+        // Construir URL completa del archivo
+        const fileUrl = detalle.startsWith('http') ? detalle : `${backend_url}${detalle}`;
+        window.open(fileUrl, '_blank');
       };
 
       return (

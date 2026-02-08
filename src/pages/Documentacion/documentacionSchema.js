@@ -61,7 +61,6 @@ export const getDocumentacionSchema = (tipoEntidad, mode = 'create') => {
       .refine((file) => file.type === ACCEPTED_FILE_TYPE, {
         message: 'Solo se permiten archivos PDF',
       })
-      .optional()
-      .or(z.literal('')),
+      .optional(),
   });
 };

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { FileText, Eye } from 'lucide-react';
 import { getDocumentacionSchema, TIPOS_DOC_CHOFER, TIPOS_DOC_VEHICULO } from './documentacionSchema';
+import { backend_url } from '@/configuration/app.config';
 
 export const DocumentacionForm = ({
   open,
@@ -47,7 +48,7 @@ export const DocumentacionForm = ({
     resolver: zodResolver(schema),
     defaultValues: {
       nombre: '',
-      detalle: '',
+      detalle: undefined, // No establecer valor por defecto para el archivo
       renovacion: '',
       fechaVencimiento: '',
       ...defaultValues,
@@ -60,14 +61,14 @@ export const DocumentacionForm = ({
       if (mode === 'create') {
         form.reset({
           nombre: '',
-          detalle: '',
+          detalle: undefined, // Archivo debe ser seleccionado, no string vacío
           renovacion: '',
           fechaVencimiento: '',
         });
       } else if (defaultValues) {
         form.reset({
           nombre: defaultValues.nombre || '',
-          detalle: '', // No establecemos el archivo aquí
+          detalle: undefined, // No establecemos el archivo aquí en edición tampoco
           renovacion: defaultValues.renovacion || '',
           fechaVencimiento: defaultValues.fechaVencimiento
             ? new Date(defaultValues.fechaVencimiento.split('/').reverse().join('-'))
@@ -81,24 +82,42 @@ export const DocumentacionForm = ({
 
   const handleFileChange = (e, field) => {
     const file = e.target.files?.[0];
+    console.log('=== handleFileChange ===');
+    console.log('Archivo seleccionado:', file);
     if (file) {
       field.onChange(file);
       setSelectedFileName(file.name);
+      console.log('Archivo establecido en el form');
+    } else {
+      console.log('No se seleccionó archivo');
     }
   };
 
   const handleViewCurrentPDF = () => {
     if (defaultValues?.detalle) {
-      window.open(defaultValues.detalle, '_blank');
+      // Construir URL completa del archivo
+      const fileUrl = defaultValues.detalle.startsWith('http') 
+        ? defaultValues.detalle 
+        : `${backend_url}${defaultValues.detalle}`;
+      window.open(fileUrl, '_blank');
     }
   };
 
   const handleSubmit = async (data) => {
+    console.log('=== DATOS DEL FORMULARIO ==>', data);
+    console.log('Detalle es File?', data.detalle instanceof File);
+    console.log('Tipo de detalle:', typeof data.detalle, data.detalle);
+    
     // Crear FormData para enviar archivo
     const formData = new FormData();
     
     formData.append('nombre', data.nombre);
-    formData.append('renovacion', data.renovacion || '');
+    
+    // Solo agregar renovacion si tiene valor
+    if (data.renovacion) {
+      formData.append('renovacion', data.renovacion);
+    }
+    
     formData.append('fechaVencimiento', data.fechaVencimiento);
     formData.append('tipoEntidad', tipoEntidad);
 
@@ -108,9 +127,19 @@ export const DocumentacionForm = ({
       formData.append('idVehiculo', idEntidad);
     }
 
-    // Agregar archivo solo si se seleccionó uno
-    if (data.detalle instanceof File) {
+    // Agregar archivo SOLO si realmente se seleccionó uno y es un File
+    if (data.detalle && data.detalle instanceof File) {
+      console.log('Agregando archivo al FormData:', data.detalle.name);
       formData.append('detalle', data.detalle);
+    } else {
+      console.log('NO se agregó archivo - mode:', mode);
+    }
+    // NO agregar detalle si no hay archivo - esto evita enviar objetos vacíos
+    
+    // Log del FormData
+    console.log('=== CONTENIDO DEL FORMDATA ===');
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ':', pair[1]);
     }
 
     const result = await onSubmit(formData);
