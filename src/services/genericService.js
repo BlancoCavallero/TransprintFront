@@ -35,6 +35,20 @@ export const postGeneric = async (
   params = {}
 ) => {
   if (!endpoint) throw new Error("Endpoint no definido");
+  
+  // Si data es FormData, crear una config SIN usar la instancia api predefinida
+  // para evitar el Content-Type: application/json predefinido
+  if (data instanceof FormData) {
+    const response = await axios.post(`${backend_url}/api${endpoint}`, data, {
+      headers: {
+        ...headers,
+        // NO establecer Content-Type, axios lo hará automáticamente con el boundary
+      },
+      params,
+    });
+    return response.data;
+  }
+  
   const response = await api.post(endpoint, data, { headers, params });
   return response.data;
 };
@@ -42,6 +56,19 @@ export const postGeneric = async (
 // PUT
 export const putGeneric = async (endpoint, data, headers = {}, params = {}) => {
   if (!endpoint) throw new Error("Endpoint no definido");
+  
+  // Si data es FormData, crear una config SIN usar la instancia api predefinida
+  if (data instanceof FormData) {
+    const response = await axios.put(`${backend_url}/api${endpoint}`, data, {
+      headers: {
+        ...headers,
+        // NO establecer Content-Type, axios lo hará automáticamente con el boundary
+      },
+      params,
+    });
+    return response.data;
+  }
+  
   const response = await api.put(endpoint, data, { headers, params });
   return response.data;
 };

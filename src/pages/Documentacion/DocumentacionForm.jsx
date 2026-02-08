@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { FileText, Eye } from 'lucide-react';
 import { getDocumentacionSchema, TIPOS_DOC_CHOFER, TIPOS_DOC_VEHICULO } from './documentacionSchema';
+import { backend_url } from '@/configuration/app.config';
 
 export const DocumentacionForm = ({
   open,
@@ -47,7 +48,6 @@ export const DocumentacionForm = ({
     resolver: zodResolver(schema),
     defaultValues: {
       nombre: '',
-      detalle: null, 
       detalle: undefined, // No establecer valor por defecto para el archivo
       renovacion: '',
       fechaVencimiento: '',
@@ -56,42 +56,50 @@ export const DocumentacionForm = ({
   });
 
   useEffect(() => {
-    if (!open) return;
     if (open) {
       setSelectedFileName('');
       if (mode === 'create') {
         form.reset({
           nombre: '',
-          detalle: null,
           detalle: undefined, // Archivo debe ser seleccionado, no string vacío
           renovacion: '',
           fechaVencimiento: '',
         });
+      } else if (defaultValues) {
+        form.reset({
+          nombre: defaultValues.nombre || '',
+          detalle: undefined, // No establecemos el archivo aquí en edición tampoco
+          renovacion: defaultValues.renovacion || '',
+          fechaVencimiento: defaultValues.fechaVencimiento
+            ? new Date(defaultValues.fechaVencimiento.split('/').reverse().join('-'))
+                .toISOString()
+                .split('T')[0]
+            : '',
+        });
       }
-
-{mode === 'edit' && defaultValues?.detalle && (
-  <a
-    href={defaultValues.detalle}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-sm text-blue-600 underline"
-  >
-    Ver documento actual
-  </a>
-)}
-    }, [open, mode, defaultValues, form]);
+    }
+  }, [open, mode, defaultValues, form]);
 
   const handleFileChange = (e, field) => {
     const file = e.target.files?.[0];
+    console.log('=== handleFileChange ===');
+    console.log('Archivo seleccionado:', file);
     if (file) {
       field.onChange(file);
       setSelectedFileName(file.name);
+      console.log('Archivo establecido en el form');
+    } else {
+      console.log('No se seleccionó archivo');
     }
   };
 
   const handleViewCurrentPDF = () => {
     if (defaultValues?.detalle) {
-      window.open(defaultValues.detalle, '_blank');
+      // Construir URL completa del archivo
+      const fileUrl = defaultValues.detalle.startsWith('http') 
+        ? defaultValues.detalle 
+        : `${backend_url}${defaultValues.detalle}`;
+      window.open(fileUrl, '_blank');
     }
   };
 
@@ -227,7 +235,6 @@ export const DocumentacionForm = ({
                       type="file"
                       accept="application/pdf"
                       disabled={isLoading}
-                      onChange={(e) => field.onChange(e.target.files?.[0] || null)}
                       onChange={(e) => handleFileChange(e, { onChange })}
                       {...fieldProps}
                     />
