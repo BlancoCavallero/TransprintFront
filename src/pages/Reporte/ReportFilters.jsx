@@ -1,44 +1,89 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Filter, Download } from "lucide-react";
+import { Filter, X } from "lucide-react";
 
-export function ReportFilters() {
+export function ReportFilters({ onApplyFilters, initialFiltros }) {
+  const [selectedMes, setSelectedMes] = useState(
+    initialFiltros?.mes ? initialFiltros.mes.toString() : "todos"
+  );
+  const [selectedAnio, setSelectedAnio] = useState(
+    initialFiltros?.anio ? initialFiltros.anio.toString() : new Date().getFullYear().toString()
+  );
+
   const months = [
-    "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-    "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+    { value: "1", label: "Enero" },
+    { value: "2", label: "Febrero" },
+    { value: "3", label: "Marzo" },
+    { value: "4", label: "Abril" },
+    { value: "5", label: "Mayo" },
+    { value: "6", label: "Junio" },
+    { value: "7", label: "Julio" },
+    { value: "8", label: "Agosto" },
+    { value: "9", label: "Septiembre" },
+    { value: "10", label: "Octubre" },
+    { value: "11", label: "Noviembre" },
+    { value: "12", label: "Diciembre" },
   ];
-  const years = [2023, 2024, 2025];
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
+
+  const handleApplyFilters = () => {
+    const filtros = {
+      mes: selectedMes === "todos" ? null : parseInt(selectedMes),
+      anio: parseInt(selectedAnio),
+    };
+    onApplyFilters(filtros);
+  };
+
+  const handleClearFilters = () => {
+    setSelectedMes("todos");
+    setSelectedAnio(currentYear.toString());
+    onApplyFilters({ mes: null, anio: currentYear });
+  };
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <Filter className="h-4 w-4 text-muted-foreground" />
-        <Select defaultValue="Noviembre">
-          <SelectTrigger className="w-[140px]">
+        
+        <Select value={selectedMes} onValueChange={setSelectedMes}>
+          <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Mes" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="todos">Todos los meses</SelectItem>
             {months.map((m) => (
-              <SelectItem key={m} value={m}>{m}</SelectItem>
+              <SelectItem key={m.value} value={m.value}>
+                {m.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select defaultValue="2025">
-          <SelectTrigger className="w-[100px]">
+
+        <Select value={selectedAnio} onValueChange={setSelectedAnio}>
+          <SelectTrigger className="w-[110px]">
             <SelectValue placeholder="Año" />
           </SelectTrigger>
           <SelectContent>
             {years.map((y) => (
-              <SelectItem key={y} value={y}>{y}</SelectItem>
+              <SelectItem key={y} value={y.toString()}>
+                {y}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
-      </div>
 
-      <Button variant="outline" size="sm" className="flex items-center gap-2">
-        <Download className="w-4 h-4" />
-        Exportar
-      </Button>
+        <Button onClick={handleApplyFilters} size="sm">
+          Aplicar
+        </Button>
+
+        <Button onClick={handleClearFilters} variant="outline" size="sm">
+          <X className="w-4 h-4 mr-1" />
+          Limpiar
+        </Button>
+      </div>
     </div>
   );
 }
