@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, FileText, Calendar, Activity } from 'lucide-react';
+import { Eye, Edit, Trash2, FileText, Calendar, Activity, ExternalLink } from 'lucide-react';
 import { ArrowUpDown } from 'lucide-react';
 
 export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
@@ -74,6 +74,7 @@ export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
     },
   },
   {
+<<<<<<< HEAD
     id: 'archivo',
     header: 'Archivo',
     cell: ({ row }) => {
@@ -96,6 +97,37 @@ export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
     },
   },
 
+=======
+    accessorKey: 'detalle',
+    header: 'Archivo',
+    cell: ({ row }) => {
+      const detalle = row.original.detalle;
+      
+      if (!detalle) {
+        return (
+          <span className="text-sm text-muted-foreground">Sin archivo</span>
+        );
+      }
+
+      const handleViewPDF = () => {
+        window.open(detalle, '_blank');
+      };
+
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleViewPDF}
+          className="h-8 gap-1 hover:bg-blue-50"
+        >
+          <FileText className="h-3.5 w-3.5 text-blue-600" />
+          <span className="text-blue-600">Ver PDF</span>
+          <ExternalLink className="h-3 w-3 text-blue-600" />
+        </Button>
+      );
+    },
+  },
+>>>>>>> df8d03b (Enviar documentacion pdf)
   {
     id: 'acciones',
     header: 'Acciones',
