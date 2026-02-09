@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import { Search } from 'lucide-react';
 
 export const ClienteTable = ({ columns, data }) => {
   const [sorting, setSorting] = useState([]);
@@ -39,19 +40,38 @@ export const ClienteTable = ({ columns, data }) => {
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Input
-          placeholder="Filtrar por nombre..."
-          value={table.getColumn('nombreCompleto')?.getFilterValue() ?? ''}
-          onChange={(event) =>
-            table.getColumn('nombreCompleto')?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+    <div className="flex flex-col gap-[20px] justify-center w-full">
+      {/* 1. Buscador */}
+      <div style={{ paddingLeft: '20px', paddingRight: '20px' }} className="flex items-center justify-between w-full">
+        <div className="relative w-full flex items-center">
+          <Search 
+            style={{ 
+              position: 'absolute', 
+              left: '12px', 
+              top: '50%', 
+              transform: 'translateY(-50%)',
+              zIndex: 10 
+            }} 
+            className="h-4 w-4 text-muted-foreground" 
+          />
+          
+          <Input
+            placeholder="Buscar por nombre, email o empresa..."
+            value={table.getColumn('nombreCompleto')?.getFilterValue() ?? ''}
+            onChange={(event) =>
+              table.getColumn('nombreCompleto')?.setFilterValue(event.target.value)
+            }
+            style={{ paddingLeft: '45px', width: '100%' }}
+            className="w-full"
+          />
+        </div>
       </div>
 
-      <div className="rounded-md border">
+      {/* 2. Tabla */}
+      <div 
+        style={{ padding: '20px' }} 
+        className="rounded-md border"
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -100,23 +120,47 @@ export const ClienteTable = ({ columns, data }) => {
         </Table>
       </div>
 
-      <div className="flex items-center justify-end space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
+      {/* 3. Paginación: Corregida con padding forzado */}
+      <div 
+        style={{ paddingRight: '25px', paddingBottom: '25px' }} 
+        className="flex items-center justify-end"
+      >
+        <div style={{ display: 'flex', gap: '15px' }}> {/* Espacio entre botones */}
+          <Button
+            variant="outline"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            style={{ 
+              height: '40px', 
+              paddingLeft: '20px', 
+              paddingRight: '20px',
+              border: '1px solid #cbd5e1', // Borde visible igual que "Actualizar"
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            className="transition-all active:scale-95 shadow-sm"
+          >
+            Anterior
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            style={{ 
+              height: '40px', 
+              paddingLeft: '20px', 
+              paddingRight: '20px',
+              border: '1px solid #cbd5e1',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            className="transition-all active:scale-95 shadow-sm"
+          >
+            Siguiente
+          </Button>
+        </div>
       </div>
     </div>
   );
