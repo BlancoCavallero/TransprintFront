@@ -90,7 +90,7 @@ export const UsuarioProvider = ({ children }) => {
       // Guardar datos básicos pero marcar que no están completos
       localStorage.setItem("user_data", JSON.stringify(baseUserData));
 
-      console.log("✅ Usuario logueado (datos básicos):", baseUserData);
+
 
       dispatch({
         type: types.login,

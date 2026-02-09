@@ -97,7 +97,7 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo, onReactivar
     if (result.success) {
       setIsCreateDocOpen(false);
       toast.success('Documentación registrada exitosamente', {
-        description: `La documentación de tipo "${data.nombre}" ha sido agregada al vehículo.`
+        description: `La documentación ha sido agregada al vehículo.`
       });
     } else {
       toast.error('Error al registrar documentación', {

@@ -117,6 +117,13 @@ export const Vehiculo = () => {
     }
   };
 
+  const handleDetailDialogChange = (nextOpen) => {
+    setIsDetailDialogOpen(nextOpen);
+    if (!nextOpen) {
+      refetch();
+    }
+  };
+
   const columns = createVehiculoColumns(
     handleEditClick,
     handleDeleteClick,
@@ -181,7 +188,7 @@ export const Vehiculo = () => {
 
       <VehiculoDetailDialog
         open={isDetailDialogOpen}
-        onOpenChange={setIsDetailDialogOpen}
+        onOpenChange={handleDetailDialogChange}
         vehiculo={selectedVehiculo}
         onReactivar={handleReactivarVehiculo}
         loadingReactivar={loadingReactivar}

@@ -22,8 +22,8 @@ export const getDocumentacionSchema = (tipoEntidad, mode = 'create') => {
       .number({ invalid_type_error: 'Debe ingresar un número' })
       .int({ message: 'La renovación debe ser un número entero' })
       .positive({ message: 'La renovación debe ser mayor a 0' })
-      .refine((val) => val <= 12, {
-        message: 'La renovación no puede ser mayor a 12 meses',
+      .refine((val) => val <= 120, {
+        message: 'La renovación no puede ser mayor a 120 meses(10 años)',
       })
       .optional()
       .or(z.literal('')),

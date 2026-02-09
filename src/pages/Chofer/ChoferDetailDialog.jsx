@@ -85,10 +85,11 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer, onReactivar, lo
 
   const handleCreateDocSubmit = async (data) => {
     const result = await handleCreateDoc(data);
+    console.log("Create doc result:", result);
     if (result.success) {
       setIsCreateDocOpen(false);
       toast.success('Documentación registrada exitosamente', {
-        description: `La documentación de tipo "${data.nombre}" ha sido agregada al chofer.`
+        description: `La documentación sido agregada al chofer.`
       });
     } else {
       toast.error('Error al registrar documentación', {

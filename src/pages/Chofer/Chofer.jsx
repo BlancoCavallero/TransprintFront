@@ -115,6 +115,13 @@ export const Chofer = () => {
     }
   };
 
+  const handleDetailDialogChange = (nextOpen) => {
+    setIsDetailDialogOpen(nextOpen);
+    if (!nextOpen) {
+      refetch();
+    }
+  };
+
   const columns = createChoferColumns(handleEditClick, handleDeleteClick, handleViewClick);
 
   if (loading) {
@@ -158,7 +165,7 @@ export const Chofer = () => {
 
       <ChoferDetailDialog
         open={isDetailDialogOpen}
-        onOpenChange={setIsDetailDialogOpen}
+        onOpenChange={handleDetailDialogChange}
         chofer={selectedChofer}
         onReactivar={handleReactivarChofer}
         loadingReactivar={loadingReactivar}

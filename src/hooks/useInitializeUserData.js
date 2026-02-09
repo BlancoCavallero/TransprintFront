@@ -14,7 +14,6 @@ export const useInitializeUserData = () => {
     if (isAuthenticated && !userDataReady && user?.user_id) {
       const fetchAndUpdateUserData = async () => {
         try {
-          console.log("🔄 Cargando datos completos del usuario...");
           
           // Esperar un poco para asegurar que la sesión está lista
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -33,7 +32,6 @@ export const useInitializeUserData = () => {
           const usuarioActual = usuarios.find(u => u.user_id === user.user_id);
           
           if (usuarioActual) {
-            console.log("✅ Datos del usuario cargados:", usuarioActual);
             // Actualizar el contexto con los datos completos
             updateUserData(usuarioActual);
           } else {
