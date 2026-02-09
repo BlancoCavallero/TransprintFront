@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, Mail, Phone, Building } from "lucide-react";
+import { Eye, Edit, Trash2, Mail, Phone, Building, RotateCcw, CheckCircle, XCircle } from "lucide-react";
 import { ArrowUpDown } from 'lucide-react';
 
-export const createClienteColumns = (onEdit, onDelete, onView) => [
+export const createClienteColumns = (onEdit, onDelete, onView, onReactivar, loadingReactivar) => [
   {
     accessorKey: 'nombreCompleto',
     header: ({ column }) => {
@@ -77,10 +77,47 @@ export const createClienteColumns = (onEdit, onDelete, onView) => [
     },
   },
   {
+    accessorKey: 'activo',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Estado
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const isActivo = row.original.activo === 1;
+      return (
+        <div className="flex items-center gap-2">
+          {isActivo ? (
+            <>
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                Activo
+              </span>
+            </>
+          ) : (
+            <>
+              <XCircle className="h-4 w-4 text-red-600" />
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                Inactivo
+              </span>
+            </>
+          )}
+        </div>
+      );
+    },
+  },
+  {
     id: 'acciones',
     header: 'Acciones',
     cell: ({ row }) => {
       const cliente = row.original;
+      const isActivo = cliente.activo === 1;
 
       return (
         <div className="flex items-center gap-2">
@@ -102,15 +139,28 @@ export const createClienteColumns = (onEdit, onDelete, onView) => [
           >
             <Edit className="h-4 w-4 text-yellow-600" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 hover:bg-red-50"
-            onClick={() => onDelete(cliente)}
-            title="Eliminar"
-          >
-            <Trash2 className="h-4 w-4 text-red-600" />
-          </Button>
+          {isActivo ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-red-50"
+              onClick={() => onDelete(cliente)}
+              title="Dar de baja"
+            >
+              <Trash2 className="h-4 w-4 text-red-600" />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-green-50"
+              onClick={() => onReactivar && onReactivar(cliente)}
+              disabled={loadingReactivar}
+              title="Reactivar cliente"
+            >
+              <RotateCcw className="h-4 w-4 text-green-600" />
+            </Button>
+          )}
         </div>
       );
     },

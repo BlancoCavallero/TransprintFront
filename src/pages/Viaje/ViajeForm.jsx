@@ -38,8 +38,11 @@ export const ViajeForm = ({ open, onOpenChange, onSubmit, defaultValues, isLoadi
   const schema = getViajeSchema(mode);
   const { choferes, loading: loadingChoferes } = useChofer({ estado: 'Habilitado' });
   const { vehiculos, loading: loadingVehiculos } = useVehiculo({ estado: 'Habilitado' });
-  const { clientes, loading: loadingClientes } = useCliente();
+  const { clientes: allClientes, loading: loadingClientes } = useCliente();
   const { localidades, loading: loadingLocalidades } = useLocalidad();
+  
+  // Filtrar solo clientes activos
+  const clientes = allClientes.filter(cliente => cliente.activo === 1);
 
   const form = useForm({
     resolver: zodResolver(schema),

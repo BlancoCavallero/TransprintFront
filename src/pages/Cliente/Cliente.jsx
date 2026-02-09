@@ -118,7 +118,13 @@ export const Cliente = () => {
     }
   };
 
-  const columns = createClienteColumns(handleEditClick, handleDeleteClick, handleViewClick);
+  const columns = createClienteColumns(
+    handleEditClick, 
+    handleDeleteClick, 
+    handleViewClick, 
+    handleReactivarCliente,
+    loadingReactivar
+  );
 
   if (loading) {
     return (
