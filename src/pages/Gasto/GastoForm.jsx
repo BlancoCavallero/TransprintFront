@@ -44,7 +44,7 @@ export const GastoForm = ({
     resolver: zodResolver(schema),
     defaultValues: {
       detalle: '',
-      monto: 0,
+      monto: 0, // Mantener como número, no cadena vacía
       tipo: '',
       idViaje: idViaje || '',
     },
@@ -126,9 +126,10 @@ export const GastoForm = ({
                   <FormControl>
                     <Input 
                       type="number" 
-                      placeholder="0" 
+                      placeholder="Ej: 100.50" 
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      value={field.value === 0 ? '' : field.value}
+                      onChange={(e) => field.onChange(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
                     />
                   </FormControl>
                   <FormMessage />
