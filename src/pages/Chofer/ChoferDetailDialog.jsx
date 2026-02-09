@@ -232,7 +232,7 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer, onReactivar, lo
           </div>
 
           {/* Información del Sistema */}
-          <div className="border rounded-lg p-4 space-y-3 bg-muted/50">
+          {/* <div className="border rounded-lg p-4 space-y-3 bg-muted/50">
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <FileText className="h-5 w-5" />
               Información del Sistema
@@ -247,7 +247,7 @@ export const ChoferDetailDialog = ({ open, onOpenChange, chofer, onReactivar, lo
                 <p className="font-medium font-mono">{chofer.idPersona || 'N/A'}</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </TabsContent>
 
         <TabsContent value="documentacion" className="space-y-4 mt-4">

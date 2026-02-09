@@ -73,14 +73,14 @@ export const DocumentacionDetailDialog = ({ open, onOpenChange, documentacion })
           </div>
 
           {/* Detalle */}
-          {documentacion.detalle && (
+          {/* {documentacion.detalle && (
             <div className="space-y-3 pt-3 border-t">
               <h3 className="text-sm font-semibold text-gray-900">Detalle</h3>
               <p className="text-sm bg-gray-50 p-3 rounded-md border border-gray-200">
                 {documentacion.detalle}
               </p>
             </div>
-          )}
+          )} */}
 
           {/* Información de la Entidad Asociada */}
           {documentacion.tipoEntidad === 'CHOFER' && documentacion.chofer && (
@@ -133,7 +133,7 @@ export const DocumentacionDetailDialog = ({ open, onOpenChange, documentacion })
           )}
 
           {/* Información del Sistema */}
-          <div className="space-y-3 pt-3 border-t">
+          {/* <div className="space-y-3 pt-3 border-t">
             <h3 className="text-sm font-semibold text-gray-900">Información del Sistema</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
@@ -149,7 +149,7 @@ export const DocumentacionDetailDialog = ({ open, onOpenChange, documentacion })
                 <p className="text-sm font-medium">{documentacion.tipoEntidad || 'Sin tipo'}</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </DialogContent>
     </Dialog>

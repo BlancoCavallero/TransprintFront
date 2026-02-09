@@ -230,7 +230,7 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo, onReactivar
           </div>
 
           {/* Información del Sistema */}
-          <div className="space-y-3 pt-3 border-t">
+          {/* <div className="space-y-3 pt-3 border-t">
             <h3 className="text-sm font-semibold text-gray-900">Información del Sistema</h3>
             <div className="space-y-1">
               <p className="text-xs text-gray-500">ID del Vehículo</p>
@@ -239,7 +239,7 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo, onReactivar
                 <p className="text-sm font-mono">{vehiculo.idVehiculo || 'Sin ID'}</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </TabsContent>
 
         <TabsContent value="documentacion" className="space-y-4 mt-4">

@@ -248,11 +248,11 @@ export const DocumentacionForm = ({
               name="renovacion"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Renovación (días) *</FormLabel>
+                  <FormLabel>Renovación (meses) *</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="Ej: 365"
+                      placeholder="Ej: 1-12"
                       disabled={isLoading}
                       {...field}
                     />
