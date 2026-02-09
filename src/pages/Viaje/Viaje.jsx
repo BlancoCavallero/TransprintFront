@@ -6,7 +6,7 @@ import { ViajeDetailDialog } from './ViajeDetailDialog';
 import { createViajeColumns } from './ViajeTableColumns';
 import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, Map } from 'lucide-react'; // Añadí Map para el icono del título
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -50,12 +50,10 @@ export const Viaje = () => {
     const result = await handleCreate(data);
     if (result.success) {
       setIsCreateDialogOpen(false);
-      toast.success('Viaje creado exitosamente', {
-        description: 'El viaje ha sido registrado en el sistema.'
-      });
+      toast.success('Viaje creado exitosamente');
     } else {
       toast.error('Error al crear viaje', {
-        description: result.error || 'Ocurrió un error al intentar crear el viaje.'
+        description: result.error || 'Ocurrió un error.'
       });
     }
     return result;
@@ -71,13 +69,9 @@ export const Viaje = () => {
     if (result.success) {
       setIsEditDialogOpen(false);
       setSelectedItem(null);
-      toast.success('Viaje actualizado exitosamente', {
-        description: 'Los datos del viaje han sido actualizados.'
-      });
+      toast.success('Viaje actualizado exitosamente');
     } else {
-      toast.error('Error al actualizar viaje', {
-        description: result.error || 'Ocurrió un error al intentar actualizar el viaje.'
-      });
+      toast.error('Error al actualizar viaje');
     }
     return result;
   };
@@ -88,13 +82,7 @@ export const Viaje = () => {
     if (result.success) {
       setIsDeleteDialogOpen(false);
       setSelectedItem(null);
-      toast.success('Viaje eliminado exitosamente', {
-        description: 'El viaje ha sido eliminado del sistema.'
-      });
-    } else {
-      toast.error('Error al eliminar viaje', {
-        description: result.error || 'Ocurrió un error al intentar eliminar el viaje.'
-      });
+      toast.success('Viaje eliminado exitosamente');
     }
   };
 
@@ -106,43 +94,60 @@ export const Viaje = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin text-gray-500" />
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <RefreshCw className="h-10 w-10 animate-spin" style={{ color: '#592673' }} />
+        <p className="text-sm font-medium text-slate-500">Cargando viajes...</p>
       </div>
     );
   }
 
   return (
-    <div className="">
-      <div className="flex items-center justify-between mb-6">
+    <div style={{ padding: '10px 0' }}>
+      {/* Header idéntico a Cliente/Chofer */}
+      <div className="flex items-center justify-between mb-8" style={{ padding: '0 20px' }}>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Viajes</h1>
-          <p className="text-muted-foreground">
-            Gestiona todos los viajes desde aquí
+          <h1 className="text-4xl font-bold tracking-tight flex items-center gap-3">
+             <Map className="h-8 w-8" style={{ color: '#592673' }} />
+             Viajes
+          </h1>
+          <p className="text-base text-muted-foreground mt-1">
+            Gestiona la logística y el seguimiento de los viajes.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={refetch} disabled={loading}>
+        <div className="flex gap-3">
+          <Button 
+            variant="outline" 
+            onClick={refetch} 
+            disabled={loading}
+            style={{ border: '1px solid #cbd5e1', height: '45px', padding: '0 20px' }}
+          >
             <RefreshCw className="mr-2 h-4 w-4" />
             Actualizar
           </Button>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)}
+            style={{ backgroundColor: '#592673', color: 'white', height: '45px', padding: '0 25px' }}
+          >
+            <Plus className="mr-2 h-5 w-5" />
             Nuevo Viaje
           </Button>
         </div>
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+        <div style={{ margin: '0 20px 20px 20px' }}>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </div>
       )}
 
+      {/* Tabla de Viajes */}
       <ViajeTable columns={columns} data={viajes} />
 
+      {/* Diálogos */}
       <ViajeForm
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}

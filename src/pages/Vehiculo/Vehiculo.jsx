@@ -29,7 +29,6 @@ export const Vehiculo = () => {
     refetch,
   } = useVehiculo();
 
-
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -123,7 +122,7 @@ export const Vehiculo = () => {
     handleViewClick
   );
 
-  if (loading) {
+  if (loading && !vehiculos.length) {
     return (
       <div className="flex items-center justify-center h-64">
         <RefreshCw className="h-8 w-8 animate-spin text-gray-500" />
@@ -132,35 +131,51 @@ export const Vehiculo = () => {
   }
 
   return (
-    <div className="">
-      <div className="flex items-center justify-between mb-6">
+    <div style={{ padding: '20px 30px', width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Vehículos</h1>
-          <p className="text-muted-foreground">
-            Gestiona todos tus vehículos desde aquí
-          </p>
+          <p className="text-muted-foreground">Gestiona todos tus vehículos desde aquí</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={refetch} disabled={loading}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Button 
+            variant="outline" 
+            onClick={refetch} 
+            disabled={loading}
+            style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Actualizar
           </Button>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)}
+            style={{ backgroundColor: '#592673', color: 'white', height: '40px', padding: '0 20px', border: 'none' }}
+          >
+            <Plus className="mr-2 h-5 w-5" />
             Nuevo Vehículo
           </Button>
         </div>
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <VehiculoTable columns={columns} data={vehiculos} />
+      <div className="w-full">
+        <VehiculoTable columns={columns} data={vehiculos} />
+      </div>
+
+      <VehiculoDetailDialog
+        open={isDetailDialogOpen}
+        onOpenChange={setIsDetailDialogOpen}
+        vehiculo={selectedVehiculo}
+        onReactivar={handleReactivarVehiculo}
+        loadingReactivar={loadingReactivar}
+      />
 
       <VehiculoForm
         open={isCreateDialogOpen}
@@ -177,14 +192,6 @@ export const Vehiculo = () => {
         defaultValues={selectedVehiculo}
         isLoading={loadingUpdate}
         mode="edit"
-      />
-
-      <VehiculoDetailDialog
-        open={isDetailDialogOpen}
-        onOpenChange={setIsDetailDialogOpen}
-        vehiculo={selectedVehiculo}
-        onReactivar={handleReactivarVehiculo}
-        loadingReactivar={loadingReactivar}
       />
 
       <DeleteConfirmationDialog

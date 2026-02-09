@@ -29,7 +29,6 @@ export const Chofer = () => {
     refetch,
   } = useChofer();
 
-
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -53,7 +52,6 @@ export const Chofer = () => {
 
   const handleCreateSubmit = async (data) => {
     const result = await handleCreate(data);
-    console.log("Create result:", result);
     if (result.success) {
       setIsCreateDialogOpen(false);
       toast.success('Chofer creado exitosamente', {
@@ -70,10 +68,9 @@ export const Chofer = () => {
   const handleUpdateSubmit = async (data) => {
     if (!selectedChofer) return;
     const result = await handleUpdate(selectedChofer.idChofer || selectedChofer.id, data);
-    console.log("Update result:", result);
     if (result.success) {
       setIsEditDialogOpen(false);
-      setSelectedChofer(null);
+      setSelectedCliente(null);
       toast.success('Chofer actualizado exitosamente', {
         description: `Los datos de ${data.nombre} ${data.apellido} han sido actualizados.`
       });
@@ -117,7 +114,7 @@ export const Chofer = () => {
 
   const columns = createChoferColumns(handleEditClick, handleDeleteClick, handleViewClick);
 
-  if (loading) {
+  if (loading && !choferes.length) {
     return (
       <div className="flex items-center justify-center h-64">
         <RefreshCw className="h-8 w-8 animate-spin text-gray-500" />
@@ -126,35 +123,43 @@ export const Chofer = () => {
   }
 
   return (
-    <div className="">
-      <div className="flex items-center justify-between mb-6">
+    <div style={{ padding: '20px 30px', width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Chofer</h1>
-          <p className="text-muted-foreground">
-            Gestiona todos tus chofer desde aquí
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">Choferes</h1>
+          <p className="text-muted-foreground">Gestiona todos tus choferes desde aquí</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={refetch} disabled={loading}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Button 
+            variant="outline" 
+            onClick={refetch} 
+            disabled={loading}
+            style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Actualizar
           </Button>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)}
+            style={{ backgroundColor: '#592673', color: 'white', height: '40px', padding: '0 20px', border: 'none' }}
+          >
+            <Plus className="mr-2 h-5 w-5" />
             Nuevo Chofer
           </Button>
         </div>
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <ChoferTable columns={columns} data={choferes} />
+      <div className="w-full">
+        <ChoferTable columns={columns} data={choferes} />
+      </div>
 
       <ChoferDetailDialog
         open={isDetailDialogOpen}
@@ -193,4 +198,3 @@ export const Chofer = () => {
     </div>
   );
 };
-

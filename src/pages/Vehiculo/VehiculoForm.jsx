@@ -46,14 +46,12 @@ export const VehiculoForm = ({
       marca: '',
       modelo: '',
       anio: '',
-      // estado: 'Activo',
       tipo: '',
     },
   });
 
   useEffect(() => {
     if (open && defaultValues && mode === 'edit') {
-      // Normalizar el tipo (puede venir como "CAMION" o "Camion")
       const normalizeTipo = (tipo) => {
         if (!tipo) return '';
         const tipoUpper = tipo.toUpperCase();
@@ -67,7 +65,6 @@ export const VehiculoForm = ({
         marca: defaultValues.marca || '',
         modelo: defaultValues.modelo || '',
         anio: defaultValues.anio?.toString() || '',
-        // estado: defaultValues.estado || 'Activo',
         tipo: normalizeTipo(defaultValues.tipo),
       });
     } else if (open && mode === 'create') {
@@ -76,7 +73,6 @@ export const VehiculoForm = ({
         marca: '',
         modelo: '',
         anio: '',
-        // estado: 'Activo',
         tipo: '',
       });
     }
@@ -90,130 +86,129 @@ export const VehiculoForm = ({
     }
   };
 
+  // Mismo estilo de input que ChoferForm
+  const inputStyle = {
+    paddingLeft: '15px',
+    paddingRight: '15px',
+    height: '42px',
+    borderRadius: '8px',
+    border: '1px solid #cbd5e1'
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
-        <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Crear Vehículo' : 'Editar Vehículo'}</DialogTitle>
+      <DialogContent style={{ padding: '30px', maxWidth: '525px' }}>
+        <DialogHeader style={{ marginBottom: '20px' }}>
+          <DialogTitle className="text-xl font-bold">
+            {mode === 'create' ? 'Crear Nuevo Vehículo' : 'Editar Vehículo'}
+          </DialogTitle>
           <DialogDescription>
-            {mode === 'create' ? 'Completa los datos para crear un nuevo vehículo.' : 'Modifica los datos del vehículo.'}
+            {mode === 'create'
+              ? 'Completa los datos para crear un nuevo vehículo.'
+              : 'Modifica los datos del vehículo.'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            
             <FormField
               control={form.control}
               name="patente"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Patente</FormLabel>
+                  <FormLabel className="font-bold text-sm">Patente</FormLabel>
                   <FormControl>
-                    <Input placeholder="ABC123" {...field} />
+                    <Input style={inputStyle} placeholder="ABC123" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="marca"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Marca</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ford" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="modelo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Modelo</FormLabel>
-                  <FormControl>
-                    <Input placeholder="F-150" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="anio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Año</FormLabel>
-                  <FormControl>
-                    <Input placeholder="2020" maxLength={4} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="tipo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de Vehículo</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+              <FormField
+                control={form.control}
+                name="marca"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold text-sm">Marca</FormLabel>
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Seleccione un tipo" />
-                      </SelectTrigger>
+                      <Input style={inputStyle} placeholder="Ford" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Camion">Camión</SelectItem>
-                      <SelectItem value="Acoplado">Acoplado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* TODO: Eliminar este campo cuando el backend implemente el estado automático */}
-            {/* <FormField
-              control={form.control}
-              name="estado"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estado</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+              <FormField
+                control={form.control}
+                name="modelo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold text-sm">Modelo</FormLabel>
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Seleccione un estado" />
-                      </SelectTrigger>
+                      <Input style={inputStyle} placeholder="F-150" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Activo">Activo</SelectItem>
-                      <SelectItem value="Inactivo">Inactivo</SelectItem>
-                      <SelectItem value="En mantenimiento">En mantenimiento</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <DialogFooter>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+              <FormField
+                control={form.control}
+                name="anio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold text-sm">Año</FormLabel>
+                    <FormControl>
+                      <Input style={inputStyle} placeholder="2020" maxLength={4} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tipo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold text-sm">Tipo de Vehículo</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger style={inputStyle} className="w-full">
+                          <SelectValue placeholder="Seleccione un tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Camion">Camión</SelectItem>
+                        <SelectItem value="Acoplado">Acoplado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <DialogFooter style={{ marginTop: '10px', gap: '12px' }}>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white' }}
+              >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {mode === 'create' ? 'Crear' : 'Guardar'}
               </Button>

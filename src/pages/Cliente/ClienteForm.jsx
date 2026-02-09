@@ -36,7 +36,6 @@ export const ClienteForm = ({
   onSubmit,
   defaultValues,
   localidades = [],
-  loadingLocalidades = false,
   isLoading = false,
   mode = 'create',
 }) => {
@@ -45,32 +44,49 @@ export const ClienteForm = ({
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      correo: '', razonSocial: '', tipo: 'Productor', nombre: '',
-      apellido: '', cuit: '', telefono: '', idLocalidad: undefined, observaciones: '',
+      correo: '',
+      razonSocial: '',
+      tipo: 'Productor',
+      nombre: '',
+      apellido: '',
+      cuit: '',
+      telefono: '',
+      idLocalidad: undefined,
+      observaciones: '',
     },
   });
 
   useEffect(() => {
-    if (open && defaultValues && mode === 'edit') {
-      form.reset({
-        correo: defaultValues.correo || '',
-        razonSocial: defaultValues.razonSocial || '',
-        tipo: defaultValues.tipo || 'Productor',
-        nombre: defaultValues.persona?.nombre || defaultValues.nombre || '',
-        apellido: defaultValues.persona?.apellido || defaultValues.apellido || '',
-        cuit: String(defaultValues.persona?.cuit || defaultValues.cuit || ''),
-        telefono: String(defaultValues.persona?.telefono || defaultValues.telefono || ''),
-        idLocalidad: defaultValues.idLocalidad || undefined,
-        observaciones: defaultValues.observaciones || '',
-      });
-    } else if (open && mode === 'create') {
-      form.reset({
-        correo: '', razonSocial: '', tipo: 'Productor', nombre: '',
-        apellido: '', cuit: '', telefono: '', idLocalidad: undefined, observaciones: '',
-      });
+    if (open) {
+      if (mode === 'edit' && defaultValues) {
+        form.reset({
+          correo: defaultValues.correo || '',
+          razonSocial: defaultValues.razonSocial || '',
+          tipo: defaultValues.tipo || 'Productor',
+          nombre: defaultValues.persona?.nombre || defaultValues.nombre || '',
+          apellido: defaultValues.persona?.apellido || defaultValues.apellido || '',
+          cuit: String(defaultValues.persona?.cuit || defaultValues.cuit || ''),
+          telefono: String(defaultValues.persona?.telefono || defaultValues.telefono || ''),
+          idLocalidad: defaultValues.idLocalidad || undefined,
+          observaciones: defaultValues.observaciones || '',
+        });
+      } else {
+        form.reset({
+          correo: '',
+          razonSocial: '',
+          tipo: 'Productor',
+          nombre: '',
+          apellido: '',
+          cuit: '',
+          telefono: '',
+          idLocalidad: undefined,
+          observaciones: '',
+        });
+      }
     }
   }, [open, defaultValues, mode, form]);
 
+  // Aplicamos la lógica de ChoferForm: esperar el result.success para cerrar
   const handleSubmit = async (data) => {
     const result = await onSubmit(data);
     if (result?.success) {
@@ -89,13 +105,15 @@ export const ClienteForm = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent style={{ padding: '30px', maxWidth: '550px' }} className="max-h-[85vh] overflow-y-auto">
+      <DialogContent style={{ padding: '30px', maxWidth: '550px' }} className="max-h-[90vh] overflow-y-auto">
         <DialogHeader style={{ marginBottom: '20px' }}>
           <DialogTitle className="text-xl font-bold">
             {mode === 'create' ? 'Crear Nuevo Cliente' : 'Editar Cliente'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'create' ? 'Ingresa los datos del nuevo cliente.' : 'Modifica los datos del cliente.'}
+            {mode === 'create' 
+              ? 'Completa los datos para crear un nuevo cliente.' 
+              : 'Modifica los datos del cliente.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -106,14 +124,14 @@ export const ClienteForm = ({
               <FormField control={form.control} name="nombre" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-sm">Nombre</FormLabel>
-                  <FormControl><Input style={inputStyle} placeholder="Juan" {...field} /></FormControl>
+                  <FormControl><Input style={inputStyle} placeholder="Jorge" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
               <FormField control={form.control} name="apellido" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-sm">Apellido</FormLabel>
-                  <FormControl><Input style={inputStyle} placeholder="Pérez" {...field} /></FormControl>
+                  <FormControl><Input style={inputStyle} placeholder="Perez" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
@@ -122,7 +140,7 @@ export const ClienteForm = ({
             <FormField control={form.control} name="correo" render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold text-sm">Email</FormLabel>
-                <FormControl><Input style={inputStyle} placeholder="contacto@empresa.com" {...field} /></FormControl>
+                <FormControl><Input style={inputStyle} placeholder="ejemplo@correo.com" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
@@ -130,7 +148,7 @@ export const ClienteForm = ({
             <FormField control={form.control} name="razonSocial" render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold text-sm">Razón Social</FormLabel>
-                <FormControl><Input style={inputStyle} placeholder="Transporte ABC S.A." {...field} /></FormControl>
+                <FormControl><Input style={inputStyle} placeholder="Empresa S.A." {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )} />
@@ -157,14 +175,14 @@ export const ClienteForm = ({
               <FormField control={form.control} name="cuit" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-sm">CUIT</FormLabel>
-                  <FormControl><Input style={inputStyle} placeholder="20123456789" {...field} /></FormControl>
+                  <FormControl><Input style={inputStyle} placeholder="20409873460" maxLength={11} {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
               <FormField control={form.control} name="telefono" render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-bold text-sm">Teléfono</FormLabel>
-                  <FormControl><Input style={inputStyle} placeholder="1187654321" {...field} /></FormControl>
+                  <FormControl><Input style={inputStyle} placeholder="1123456789" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
@@ -173,10 +191,10 @@ export const ClienteForm = ({
             <FormField control={form.control} name="idLocalidad" render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-bold text-sm">Localidad</FormLabel>
-                <Select onValueChange={(value) => field.onChange(parseInt(value, 10))} value={field.value ? String(field.value) : undefined}>
+                <Select onValueChange={(v) => field.onChange(parseInt(v, 10))} value={field.value ? String(field.value) : undefined}>
                   <FormControl>
                     <SelectTrigger style={inputStyle}>
-                      <SelectValue placeholder="Selecciona una localidad" />
+                      <SelectValue placeholder="Selecciona localidad" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -193,22 +211,31 @@ export const ClienteForm = ({
 
             <FormField control={form.control} name="observaciones" render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-bold text-sm">Observaciones (Opcional)</FormLabel>
+                <FormLabel className="font-bold text-sm">Observaciones</FormLabel>
                 <FormControl>
-                  <Textarea style={{ ...inputStyle, height: '80px', paddingTop: '10px' }} placeholder="Notas adicionales..." {...field} />
+                  <Textarea style={{ ...inputStyle, height: '80px', paddingTop: '10px' }} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
 
-            <DialogFooter style={{ marginTop: '10px', display: 'flex', gap: '12px' }}>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}
-                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}>
+            <DialogFooter style={{ marginTop: '10px', gap: '12px' }}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
+              >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}
-                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white', border: 'none' }}>
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : mode === 'create' ? 'Crear' : 'Guardar'}
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white' }}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {mode === 'create' ? 'Crear' : 'Guardar'}
               </Button>
             </DialogFooter>
           </form>
