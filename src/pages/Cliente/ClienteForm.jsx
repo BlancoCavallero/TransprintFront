@@ -36,7 +36,6 @@ export const ClienteForm = ({
   onSubmit,
   defaultValues,
   localidades = [],
-  loadingLocalidades = false,
   isLoading = false,
   mode = 'create',
 }) => {
@@ -58,33 +57,36 @@ export const ClienteForm = ({
   });
 
   useEffect(() => {
-    if (open && defaultValues && mode === 'edit') {
-      form.reset({
-        correo: defaultValues.correo || '',
-        razonSocial: defaultValues.razonSocial || '',
-        tipo: defaultValues.tipo || 'Productor',
-        nombre: defaultValues.persona?.nombre || defaultValues.nombre || '',
-        apellido: defaultValues.persona?.apellido || defaultValues.apellido || '',
-        cuit: String(defaultValues.persona?.cuit || defaultValues.cuit || ''),
-        telefono: String(defaultValues.persona?.telefono || defaultValues.telefono || ''),
-        idLocalidad: defaultValues.idLocalidad || undefined,
-        observaciones: defaultValues.observaciones || '',
-      });
-    } else if (open && mode === 'create') {
-      form.reset({
-        correo: '',
-        razonSocial: '',
-        tipo: 'Productor',
-        nombre: '',
-        apellido: '',
-        cuit: '',
-        telefono: '',
-        idLocalidad: undefined,
-        observaciones: '',
-      });
+    if (open) {
+      if (mode === 'edit' && defaultValues) {
+        form.reset({
+          correo: defaultValues.correo || '',
+          razonSocial: defaultValues.razonSocial || '',
+          tipo: defaultValues.tipo || 'Productor',
+          nombre: defaultValues.persona?.nombre || defaultValues.nombre || '',
+          apellido: defaultValues.persona?.apellido || defaultValues.apellido || '',
+          cuit: String(defaultValues.persona?.cuit || defaultValues.cuit || ''),
+          telefono: String(defaultValues.persona?.telefono || defaultValues.telefono || ''),
+          idLocalidad: defaultValues.idLocalidad || undefined,
+          observaciones: defaultValues.observaciones || '',
+        });
+      } else {
+        form.reset({
+          correo: '',
+          razonSocial: '',
+          tipo: 'Productor',
+          nombre: '',
+          apellido: '',
+          cuit: '',
+          telefono: '',
+          idLocalidad: undefined,
+          observaciones: '',
+        });
+      }
     }
   }, [open, defaultValues, mode, form]);
 
+  // Aplicamos la lógica de ChoferForm: esperar el result.success para cerrar
   const handleSubmit = async (data) => {
     const result = await onSubmit(data);
     if (result?.success) {
@@ -93,193 +95,145 @@ export const ClienteForm = ({
     }
   };
 
+  const inputStyle = {
+    paddingLeft: '15px',
+    paddingRight: '15px',
+    height: '42px',
+    borderRadius: '8px',
+    border: '1px solid #cbd5e1'
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent style={{ padding: '30px', maxWidth: '550px' }} className="max-h-[90vh] overflow-y-auto">
+        <DialogHeader style={{ marginBottom: '20px' }}>
+          <DialogTitle className="text-xl font-bold">
             {mode === 'create' ? 'Crear Nuevo Cliente' : 'Editar Cliente'}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'create'
-              ? 'Completa los datos para crear un nuevo cliente.'
+            {mode === 'create' 
+              ? 'Completa los datos para crear un nuevo cliente.' 
               : 'Modifica los datos del cliente.'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="nombre"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Juan" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="apellido"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Apellido</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Pérez" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <form onSubmit={form.handleSubmit(handleSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+              <FormField control={form.control} name="nombre" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-sm">Nombre</FormLabel>
+                  <FormControl><Input style={inputStyle} placeholder="Jorge" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="apellido" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-sm">Apellido</FormLabel>
+                  <FormControl><Input style={inputStyle} placeholder="Perez" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
             </div>
 
-            <FormField
-              control={form.control}
-              name="correo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
+            <FormField control={form.control} name="correo" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-sm">Email</FormLabel>
+                <FormControl><Input style={inputStyle} placeholder="ejemplo@correo.com" {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="razonSocial" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-sm">Razón Social</FormLabel>
+                <FormControl><Input style={inputStyle} placeholder="Empresa S.A." {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="tipo" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-sm">Tipo de Cliente</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <Input placeholder="contacto@empresa.com" type="email" {...field} />
+                    <SelectTrigger style={inputStyle}>
+                      <SelectValue placeholder="Selecciona un tipo" />
+                    </SelectTrigger>
                   </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Productor">Productor</SelectItem>
+                    <SelectItem value="Empresa">Empresa</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+              <FormField control={form.control} name="cuit" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-bold text-sm">CUIT</FormLabel>
+                  <FormControl><Input style={inputStyle} placeholder="20409873460" maxLength={11} {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="razonSocial"
-              render={({ field }) => (
+              )} />
+              <FormField control={form.control} name="telefono" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Razón Social</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Transporte ABC S.A." {...field} />
-                  </FormControl>
+                  <FormLabel className="font-bold text-sm">Teléfono</FormLabel>
+                  <FormControl><Input style={inputStyle} placeholder="1123456789" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="tipo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de Cliente</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecciona un tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Productor">Productor</SelectItem>
-                        <SelectItem value="Empresa">Empresa</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="cuit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CUIT</FormLabel>
-                    <FormControl>
-                      <Input placeholder="20123456789" maxLength={11} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="telefono"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Teléfono</FormLabel>
-                    <FormControl>
-                      <Input placeholder="1187654321" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              )} />
             </div>
 
-            <FormField
-              control={form.control}
-              name="idLocalidad"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Localidad</FormLabel>
+            <FormField control={form.control} name="idLocalidad" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-sm">Localidad</FormLabel>
+                <Select onValueChange={(v) => field.onChange(parseInt(v, 10))} value={field.value ? String(field.value) : undefined}>
                   <FormControl>
-                    <Select
-                      onValueChange={(value) => field.onChange(parseInt(value, 10))}
-                      value={field.value ? String(field.value) : undefined}
-                      disabled={loadingLocalidades}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={loadingLocalidades ? "Cargando localidades..." : "Selecciona una localidad"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {localidades.map((loc) => (
-                          <SelectItem
-                            key={loc.idLocalidad}
-                            value={String(loc.idLocalidad)}
-                          >
-                            {loc.localidad} - {loc.provincia} {loc.codPostal ? `(CP: ${loc.codPostal})` : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SelectTrigger style={inputStyle}>
+                      <SelectValue placeholder="Selecciona localidad" />
+                    </SelectTrigger>
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  <SelectContent>
+                    {localidades.map((loc) => (
+                      <SelectItem key={loc.idLocalidad} value={String(loc.idLocalidad)}>
+                        {loc.localidad} - {loc.provincia}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
 
-            <FormField
-              control={form.control}
-              name="observaciones"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Observaciones (Opcional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Notas adicionales sobre el cliente..."
-                      className="resize-none"
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormField control={form.control} name="observaciones" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-sm">Observaciones</FormLabel>
+                <FormControl>
+                  <Textarea style={{ ...inputStyle, height: '80px', paddingTop: '10px' }} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
 
-            <DialogFooter>
+            <DialogFooter style={{ marginTop: '10px', gap: '12px' }}>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white' }}
+              >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {mode === 'create' ? 'Crear' : 'Guardar'}
               </Button>

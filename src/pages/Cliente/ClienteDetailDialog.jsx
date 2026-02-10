@@ -17,11 +17,11 @@ export const ClienteDetailDialog = ({ open, onOpenChange, cliente, onReactivar, 
     switch (estado) {
       case 'Activo':
       case 'ACTIVO':
-        return 'bg-green-100 text-green-700';
+        return 'bg-green-100 text-green-700 border-green-200';
       case 'DE_BAJA':
-        return 'bg-orange-100 text-orange-700';
+        return 'bg-orange-100 text-orange-700 border-orange-200';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
@@ -34,23 +34,36 @@ export const ClienteDetailDialog = ({ open, onOpenChange, cliente, onReactivar, 
     return cuitStr;
   };
 
+  // Constante para unificar el estilo de las tarjetas internas
+  const cardStyle = {
+    padding: '20px',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#ffffff',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-2">
-            <User className="h-6 w-6 text-primary" />
+      {/* Ajustamos maxWidth a 550px y padding a 30px como el Form */}
+      <DialogContent style={{ padding: '30px', maxWidth: '550px' }} className="max-h-[85vh] overflow-y-auto">
+        
+        <DialogHeader style={{ marginBottom: '20px' }}>
+          <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+            <User className="h-6 w-6" style={{ color: '#592673' }} />
             Detalles del Cliente
           </DialogTitle>
-          <DialogDescription>
-            Información completa del cliente
+          <DialogDescription className="text-base">
+            Información completa y estado actual en el sistema.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Estado Badge */}
+        {/* Estado Badge - Con un poco más de margen */}
         {cliente.estado && (
-          <div className="flex justify-start">
-            <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${ getEstadoColor(cliente.estado)}`}>
+          <div style={{ marginBottom: '20px' }}>
+            <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold border ${getEstadoColor(cliente.estado)}`}>
               {cliente.estado}
             </span>
           </div>
@@ -58,18 +71,18 @@ export const ClienteDetailDialog = ({ open, onOpenChange, cliente, onReactivar, 
 
         {/* Alerta de Cliente de Baja */}
         {estaDeBaja && (
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5" />
+          <div style={{ marginBottom: '25px', padding: '18px', backgroundColor: '#fff7ed', border: '1px solid #ffedd5', borderRadius: '12px' }} className="flex items-start gap-4">
+            <AlertCircle className="h-6 w-6 text-orange-600 mt-1" />
             <div className="flex-1">
-              <h4 className="font-semibold text-orange-900">Cliente dado de baja</h4>
-              <p className="text-sm text-orange-700 mt-1">
-                Este cliente está dado de baja. Para poder realizar operaciones con este cliente, debe reactivarlo primero.
+              <h4 className="font-bold text-orange-900">Cliente dado de baja</h4>
+              <p className="text-sm text-orange-700 mt-1 leading-relaxed">
+                Este cliente está inactivo. Debe reactivarlo para poder realizar nuevas operaciones.
               </p>
               {onReactivar && (
                 <Button
                   onClick={() => onReactivar(cliente)}
                   disabled={loadingReactivar}
-                  className="mt-3 bg-orange-600 hover:bg-orange-700 text-white"
+                  style={{ marginTop: '12px', backgroundColor: '#ea580c', color: 'white' }}
                   size="sm"
                 >
                   {loadingReactivar ? 'Reactivando...' : 'Reactivar Cliente'}
@@ -79,116 +92,97 @@ export const ClienteDetailDialog = ({ open, onOpenChange, cliente, onReactivar, 
           </div>
         )}
 
-        <div className="space-y-6 mt-4">
+        {/* Contenedor principal con Gaps generosos como el form anterior */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          
           {/* Información Personal */}
-          <div className="border rounded-lg p-4 space-y-3">
-            <h3 className="font-semibold text-lg flex items-center gap-2 text-primary">
-              <User className="h-5 w-5" />
-              Información Personal
+          <div style={cardStyle}>
+            <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style={{ color: '#592673' }}>
+              <User className="h-4 w-4" /> Información Personal
             </h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <p className="text-sm text-muted-foreground">Nombre</p>
-                <p className="font-medium">
-                  {cliente.persona?.nombre || cliente.nombre || 'No especificado'}
-                </p>
+                <p className="text-xs text-slate-500 font-semibold uppercase">Nombre</p>
+                <p className="font-medium text-slate-900">{cliente.persona?.nombre || cliente.nombre || '—'}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Apellido</p>
-                <p className="font-medium">
-                  {cliente.persona?.apellido || cliente.apellido || 'No especificado'}
-                </p>
+                <p className="text-xs text-slate-500 font-semibold uppercase">Apellido</p>
+                <p className="font-medium text-slate-900">{cliente.persona?.apellido || cliente.apellido || '—'}</p>
               </div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <p className="text-xs text-slate-500 font-semibold uppercase flex items-center gap-1">
                 <Hash className="h-3 w-3" /> CUIT
               </p>
-              <p className="font-medium font-mono">
-                {formatCuit(cliente.persona?.cuit || cliente.cuit)}
-              </p>
+              <p className="font-medium font-mono text-slate-900">{formatCuit(cliente.persona?.cuit || cliente.cuit)}</p>
             </div>
           </div>
 
           {/* Información de Contacto */}
-          <div className="border rounded-lg p-4 space-y-3">
-            <h3 className="font-semibold text-lg flex items-center gap-2 text-primary">
-              <Mail className="h-5 w-5" />
-              Información de Contacto
+          <div style={cardStyle}>
+            <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style={{ color: '#592673' }}>
+              <Mail className="h-4 w-4" /> Contacto
             </h3>
-            <div>
-              <p className="text-sm text-muted-foreground flex items-center gap-1">
-                <Mail className="h-3 w-3" /> Email
-              </p>
-              <p className="font-medium">{cliente.correo || 'No especificado'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground flex items-center gap-1">
-                <Phone className="h-3 w-3" /> Teléfono
-              </p>
-              <p className="font-medium">
-                {cliente.persona?.telefono || cliente.telefono || 'No especificado'}
-              </p>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase">Email</p>
+                <p className="font-medium text-slate-900">{cliente.correo || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase">Teléfono</p>
+                <p className="font-medium text-slate-900">{cliente.persona?.telefono || cliente.telefono || '—'}</p>
+              </div>
             </div>
           </div>
 
           {/* Información Empresarial */}
-          <div className="border rounded-lg p-4 space-y-3">
-            <h3 className="font-semibold text-lg flex items-center gap-2 text-primary">
-              <Building className="h-5 w-5" />
-              Información Empresarial
+          <div style={cardStyle}>
+            <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style={{ color: '#592673' }}>
+              <Building className="h-4 w-4" /> Empresa
             </h3>
-            <div>
-              <p className="text-sm text-muted-foreground">Razón Social</p>
-              <p className="font-medium">{cliente.razonSocial || 'No especificado'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Tipo de Cliente</p>
-              <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                cliente.tipo === 'Empresa' 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'bg-green-100 text-green-700'
-              }`}>
-                {cliente.tipo || 'No especificado'}
-              </span>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase">Razón Social</p>
+                <p className="font-medium text-slate-900">{cliente.razonSocial || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase mb-1">Tipo</p>
+                <span className={`inline-block px-3 py-1 rounded-md text-xs font-bold ${
+                  cliente.tipo === 'Empresa' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-green-50 text-green-700 border border-green-100'
+                }`}>
+                  {cliente.tipo || 'No especificado'}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Localidad */}
           {cliente.localidad && (
-            <div className="border rounded-lg p-4 space-y-3">
-              <h3 className="font-semibold text-lg flex items-center gap-2 text-primary">
-                <MapPin className="h-5 w-5" />
-                Localidad
+            <div style={cardStyle}>
+              <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style={{ color: '#592673' }}>
+                <MapPin className="h-4 w-4" /> Ubicación
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Localidad</p>
-                  <p className="font-medium">{cliente.localidad.localidad || cliente.localidad.nombre}</p>
+                  <p className="text-xs text-slate-500 font-semibold uppercase">Localidad</p>
+                  <p className="font-medium text-slate-900">{cliente.localidad.localidad || cliente.localidad.nombre}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Provincia</p>
-                  <p className="font-medium">{cliente.localidad.provincia}</p>
+                  <p className="text-xs text-slate-500 font-semibold uppercase">Provincia</p>
+                  <p className="font-medium text-slate-900">{cliente.localidad.provincia}</p>
                 </div>
               </div>
-              {cliente.localidad.codPostal && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Código Postal</p>
-                  <p className="font-medium">{cliente.localidad.codPostal}</p>
-                </div>
-              )}
             </div>
           )}
 
           {/* Observaciones */}
           {cliente.observaciones && (
-            <div className="border rounded-lg p-4 space-y-3">
-              <h3 className="font-semibold text-lg flex items-center gap-2 text-primary">
-                <FileText className="h-5 w-5" />
-                Observaciones
+            <div style={{ ...cardStyle, backgroundColor: '#f8fafc' }}>
+              <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2 text-slate-600">
+                <FileText className="h-4 w-4" /> Observaciones
               </h3>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {cliente.observaciones}
+              <p className="text-sm text-slate-700 leading-relaxed italic">
+                "{cliente.observaciones}"
               </p>
             </div>
           )}

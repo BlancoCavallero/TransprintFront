@@ -71,11 +71,20 @@ export const ChoferForm = ({
     }
   };
 
+  // Mismo estilo de input que ClienteForm
+  const inputStyle = {
+    paddingLeft: '15px',
+    paddingRight: '15px',
+    height: '42px',
+    borderRadius: '8px',
+    border: '1px solid #cbd5e1'
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent style={{ padding: '30px', maxWidth: '525px' }}>
+        <DialogHeader style={{ marginBottom: '20px' }}>
+          <DialogTitle className="text-xl font-bold">
             {mode === 'create' ? 'Crear Nuevo Chofer' : 'Editar Chofer'}
           </DialogTitle>
           <DialogDescription>
@@ -86,15 +95,17 @@ export const ChoferForm = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            
             <FormField
               control={form.control}
               name="dni"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>DNI</FormLabel>
+                  <FormLabel className="font-bold text-sm">DNI</FormLabel>
                   <FormControl>
                     <Input 
+                      style={inputStyle}
                       placeholder="40880194" 
                       type="number"
                       {...field}
@@ -106,15 +117,15 @@ export const ChoferForm = ({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
               <FormField
                 control={form.control}
                 name="nombre"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nombre</FormLabel>
+                    <FormLabel className="font-bold text-sm">Nombre</FormLabel>
                     <FormControl>
-                      <Input placeholder="Jorge" {...field} />
+                      <Input style={inputStyle} placeholder="Jorge" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -126,9 +137,9 @@ export const ChoferForm = ({
                 name="apellido"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Apellido</FormLabel>
+                    <FormLabel className="font-bold text-sm">Apellido</FormLabel>
                     <FormControl>
-                      <Input placeholder="Perez" {...field} />
+                      <Input style={inputStyle} placeholder="Perez" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -141,9 +152,9 @@ export const ChoferForm = ({
               name="cuit"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>CUIT</FormLabel>
+                  <FormLabel className="font-bold text-sm">CUIT</FormLabel>
                   <FormControl>
-                    <Input placeholder="20409873460" maxLength={11} {...field} />
+                    <Input style={inputStyle} placeholder="20409873460" maxLength={11} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -155,25 +166,30 @@ export const ChoferForm = ({
               name="telefono"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Teléfono</FormLabel>
+                  <FormLabel className="font-bold text-sm">Teléfono</FormLabel>
                   <FormControl>
-                    <Input placeholder="1123456789" {...field} />
+                    <Input style={inputStyle} placeholder="1123456789" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter style={{ marginTop: '10px', gap: '12px' }}>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white' }}
+              >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {mode === 'create' ? 'Crear' : 'Guardar'}
               </Button>
