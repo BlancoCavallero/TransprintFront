@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FileText, Eye } from 'lucide-react';
+import { FileText, Eye, Loader2 } from 'lucide-react';
 import { getDocumentacionSchema, TIPOS_DOC_CHOFER, TIPOS_DOC_VEHICULO } from './documentacionSchema';
 import { backend_url } from '@/configuration/app.config';
 
@@ -48,7 +48,7 @@ export const DocumentacionForm = ({
     resolver: zodResolver(schema),
     defaultValues: {
       nombre: '',
-      detalle: undefined, // No establecer valor por defecto para el archivo
+      detalle: undefined,
       renovacion: '',
       fechaVencimiento: '',
       ...defaultValues,
@@ -61,14 +61,14 @@ export const DocumentacionForm = ({
       if (mode === 'create') {
         form.reset({
           nombre: '',
-          detalle: undefined, // Archivo debe ser seleccionado, no string vacío
+          detalle: undefined,
           renovacion: '',
           fechaVencimiento: '',
         });
       } else if (defaultValues) {
         form.reset({
           nombre: defaultValues.nombre || '',
-          detalle: undefined, // No establecemos el archivo aquí en edición tampoco
+          detalle: undefined,
           renovacion: defaultValues.renovacion || '',
           fechaVencimiento: defaultValues.fechaVencimiento
             ? new Date(defaultValues.fechaVencimiento.split('/').reverse().join('-'))
@@ -82,20 +82,14 @@ export const DocumentacionForm = ({
 
   const handleFileChange = (e, field) => {
     const file = e.target.files?.[0];
-    console.log('=== handleFileChange ===');
-    console.log('Archivo seleccionado:', file);
     if (file) {
       field.onChange(file);
       setSelectedFileName(file.name);
-      console.log('Archivo establecido en el form');
-    } else {
-      console.log('No se seleccionó archivo');
     }
   };
 
   const handleViewCurrentPDF = () => {
     if (defaultValues?.detalle) {
-      // Construir URL completa del archivo
       const fileUrl = defaultValues.detalle.startsWith('http') 
         ? defaultValues.detalle 
         : `${backend_url}${defaultValues.detalle}`;
@@ -104,20 +98,11 @@ export const DocumentacionForm = ({
   };
 
   const handleSubmit = async (data) => {
-    console.log('=== DATOS DEL FORMULARIO ==>', data);
-    console.log('Detalle es File?', data.detalle instanceof File);
-    console.log('Tipo de detalle:', typeof data.detalle, data.detalle);
-    
-    // Crear FormData para enviar archivo
     const formData = new FormData();
-    
     formData.append('nombre', data.nombre);
-    
-    // Solo agregar renovacion si tiene valor
     if (data.renovacion) {
       formData.append('renovacion', data.renovacion);
     }
-    
     formData.append('fechaVencimiento', data.fechaVencimiento);
     formData.append('tipoEntidad', tipoEntidad);
 
@@ -127,19 +112,8 @@ export const DocumentacionForm = ({
       formData.append('idVehiculo', idEntidad);
     }
 
-    // Agregar archivo SOLO si realmente se seleccionó uno y es un File
     if (data.detalle && data.detalle instanceof File) {
-      console.log('Agregando archivo al FormData:', data.detalle.name);
       formData.append('detalle', data.detalle);
-    } else {
-      console.log('NO se agregó archivo - mode:', mode);
-    }
-    // NO agregar detalle si no hay archivo - esto evita enviar objetos vacíos
-    
-    // Log del FormData
-    console.log('=== CONTENIDO DEL FORMDATA ===');
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ':', pair[1]);
     }
 
     const result = await onSubmit(formData);
@@ -149,35 +123,45 @@ export const DocumentacionForm = ({
     }
   };
 
+  // --- ESTILOS COPIADOS DE CHOFERFORM ---
+  const inputStyle = {
+    paddingLeft: '15px',
+    paddingRight: '15px',
+    height: '42px',
+    borderRadius: '8px',
+    border: '1px solid #cbd5e1'
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent style={{ padding: '30px', maxWidth: '525px' }}>
+        <DialogHeader style={{ marginBottom: '20px' }}>
+          <DialogTitle className="text-xl font-bold">
             {mode === 'create' ? 'Registrar Documentación' : 'Editar Documentación'}
           </DialogTitle>
           <DialogDescription>
             {mode === 'create'
-              ? 'Complete los campos para registrar una nueva documentación'
-              : 'Modifique los campos necesarios'}
+              ? 'Complete los campos para registrar una nueva documentación.'
+              : 'Modifique los campos necesarios.'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            
             <FormField
               control={form.control}
               name="nombre"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Documentación *</FormLabel>
+                  <FormLabel className="font-bold text-sm">Tipo de Documentación *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={isLoading}
                   >
-                    <FormControl className="w-full">
-                      <SelectTrigger className="w-full">
+                    <FormControl>
+                      <SelectTrigger style={inputStyle} className="w-full">
                         <SelectValue placeholder="Seleccione un tipo" />
                       </SelectTrigger>
                     </FormControl>
@@ -199,21 +183,21 @@ export const DocumentacionForm = ({
               name="detalle"
               render={({ field: { value, onChange, ...fieldProps } }) => (
                 <FormItem>
-                  <FormLabel>Archivo PDF *</FormLabel>
+                  <FormLabel className="font-bold text-sm">Archivo PDF *</FormLabel>
                   {mode === 'edit' && defaultValues?.detalle && (
-                    <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-md flex items-center justify-between">
+                    <div className="mb-2 p-2 bg-slate-50 border border-slate-200 rounded-md flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm text-blue-700">Archivo actual guardado</span>
+                        <FileText className="h-4 w-4 text-slate-600" />
+                        <span className="text-xs text-slate-600 font-medium">Documento actual</span>
                       </div>
                       <Button
                         type="button"
                         size="sm"
                         variant="ghost"
                         onClick={handleViewCurrentPDF}
-                        className="h-8 px-2 hover:bg-blue-100"
+                        className="h-7 px-2 hover:bg-slate-200 text-xs"
                       >
-                        <Eye className="h-4 w-4 mr-1" />
+                        <Eye className="h-3 w-3 mr-1" />
                         Ver PDF
                       </Button>
                     </div>
@@ -223,19 +207,15 @@ export const DocumentacionForm = ({
                       type="file"
                       accept="application/pdf"
                       disabled={isLoading}
+                      style={{ ...inputStyle, padding: '8px 15px' }} // Ajuste leve para el tipo file
                       onChange={(e) => handleFileChange(e, { onChange })}
                       {...fieldProps}
                     />
                   </FormControl>
                   {selectedFileName && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-1 font-medium">
                       <FileText className="h-3 w-3" />
-                      {selectedFileName}
-                    </p>
-                  )}
-                  {mode === 'edit' && (
-                    <p className="text-xs text-muted-foreground">
-                      Deje vacío para mantener el archivo actual
+                      Seleccionado: {selectedFileName}
                     </p>
                   )}
                   <FormMessage />
@@ -243,54 +223,64 @@ export const DocumentacionForm = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="renovacion"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Renovación (meses) *</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Ej: 1-12"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
+              <FormField
+                control={form.control}
+                name="renovacion"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold text-sm">Renovación (meses)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Ej: 12"
+                        disabled={isLoading}
+                        style={inputStyle}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="fechaVencimiento"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Fecha de Vencimiento *</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="fechaVencimiento"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold text-sm">Vencimiento</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        disabled={isLoading}
+                        style={inputStyle}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <DialogFooter>
+            <DialogFooter style={{ marginTop: '10px', gap: '12px' }}>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Guardando...' : mode === 'create' ? 'Registrar' : 'Actualizar'}
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white' }}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {mode === 'create' ? 'Registrar' : 'Guardar Cambios'}
               </Button>
             </DialogFooter>
           </form>

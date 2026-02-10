@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react'; // Añadimos los chevrons
 
 export const ClienteTable = ({ columns, data }) => {
   const [sorting, setSorting] = useState([]);
@@ -39,11 +39,10 @@ export const ClienteTable = ({ columns, data }) => {
     },
   });
 
-  // Definimos un estilo común para las celdas para asegurar el padding
   const cellStyle = {
     paddingLeft: '20px',
     paddingRight: '20px',
-    height: '55px', // Un poco más de altura para que no se vea apretado verticalmente
+    height: '55px',
   };
 
   return (
@@ -96,24 +95,34 @@ export const ClienteTable = ({ columns, data }) => {
         </Table>
       </div>
 
-      <div style={{ padding: '0 25px 20px 0', display: 'flex', justifyContent: 'flex-end', gap: '15px' }}>
-        <Button
-          variant="outline"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
-        >
-          Anterior
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
-        >
-          Siguiente
-        </Button>
-      </div>
+      {/* Paginación adaptada de ChoferTable: Solo aparece si hay más de una página */}
+      {table.getPageCount() > 1 && (
+        <div style={{ padding: '0 20px 20px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
+          <div className="text-sm text-muted-foreground mr-4">
+            Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              style={{ height: '36px', width: '36px', padding: '0', border: '1px solid #cbd5e1' }}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              style={{ height: '36px', width: '36px', padding: '0', border: '1px solid #cbd5e1' }}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

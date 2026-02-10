@@ -43,46 +43,76 @@ export function ReportFilters({ onApplyFilters, initialFiltros }) {
     onApplyFilters({ mes: null, anio: currentYear });
   };
 
+  // Estilo base para los triggers de los Select
+  const selectTriggerStyle = {
+    height: '40px',
+    border: '1px solid #cbd5e1',
+    display: 'flex',
+    justifyContent: 'center', // Centra el contenido horizontalmente
+    textAlign: 'center'
+  };
+
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-4">
-      <div className="flex items-center gap-2 flex-wrap">
-        <Filter className="h-4 w-4 text-muted-foreground" />
-        
-        <Select value={selectedMes} onValueChange={setSelectedMes}>
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Mes" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos los meses</SelectItem>
-            {months.map((m) => (
-              <SelectItem key={m.value} value={m.value}>
-                {m.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div style={{ padding: '0 20px' }} className="w-full">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 mr-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-gray-600">Filtros:</span>
+          </div>
+          
+          <Select value={selectedMes} onValueChange={setSelectedMes}>
+            <SelectTrigger 
+              className="w-[160px]" 
+              style={selectTriggerStyle}
+            >
+              {/* SelectValue hereda el centrado del padre */}
+              <SelectValue placeholder="Mes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos los meses</SelectItem>
+              {months.map((m) => (
+                <SelectItem key={m.value} value={m.value}>
+                  {m.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select value={selectedAnio} onValueChange={setSelectedAnio}>
-          <SelectTrigger className="w-[110px]">
-            <SelectValue placeholder="Año" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((y) => (
-              <SelectItem key={y} value={y.toString()}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={selectedAnio} onValueChange={setSelectedAnio}>
+            <SelectTrigger 
+              className="w-[110px]" 
+              style={selectTriggerStyle}
+            >
+              <SelectValue placeholder="Año" />
+            </SelectTrigger>
+            <SelectContent>
+              {years.map((y) => (
+                <SelectItem key={y} value={y.toString()}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Button onClick={handleApplyFilters} size="sm">
-          Aplicar
-        </Button>
+          <Button 
+            onClick={handleApplyFilters} 
+            size="sm"
+            style={{ height: '40px', padding: '0 20px', backgroundColor: '#592673', color: 'white', border: 'none' }}
+          >
+            Aplicar
+          </Button>
 
-        <Button onClick={handleClearFilters} variant="outline" size="sm">
-          <X className="w-4 h-4 mr-1" />
-          Limpiar
-        </Button>
+          <Button 
+            onClick={handleClearFilters} 
+            variant="outline" 
+            size="sm"
+            style={{ height: '40px', padding: '0 15px', border: '1px solid #cbd5e1' }}
+          >
+            <X className="w-4 h-4 mr-1" />
+            Limpiar
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Wrench } from 'lucide-react'; // Agregué Wrench para coherencia visual
 import { useEffect } from 'react';
 import { getMantenimientoSchema } from './mantenimientoSchema';
 import { useVehiculo } from '../../hooks/entities/useVehiculo';
@@ -67,7 +67,6 @@ export const MantenimientoForm = ({ open, onOpenChange, onSubmit, defaultValues,
   }, [open, defaultValues, mode, form]);
 
   const handleSubmit = async (data) => {
-    // Convertir idVehiculo a número
     const payload = {
       ...data,
       idVehiculo: parseInt(data.idVehiculo, 10),
@@ -80,27 +79,48 @@ export const MantenimientoForm = ({ open, onOpenChange, onSubmit, defaultValues,
     }
   };
 
+  // Estilos traídos de ClienteForm
+  const inputStyle = {
+    paddingLeft: '15px',
+    paddingRight: '15px',
+    height: '42px',
+    borderRadius: '8px',
+    border: '1px solid #cbd5e1'
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Crear Mantenimiento' : 'Editar Mantenimiento'}</DialogTitle>
+      <DialogContent 
+        style={{ 
+          padding: '30px', 
+          maxWidth: '550px',
+        }} 
+        className="max-h-[85vh] overflow-y-auto"
+      >
+        <DialogHeader style={{ marginBottom: '20px' }}>
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            <Wrench className="h-5 w-5" style={{ color: '#592673' }} />
+            {mode === 'create' ? 'Crear Mantenimiento' : 'Editar Mantenimiento'}
+          </DialogTitle>
           <DialogDescription>
-            {mode === 'create' ? 'Completa los datos para crear un nuevo mantenimiento.' : 'Modifica los datos del mantenimiento.'}
+            {mode === 'create' 
+              ? 'Completa los datos para registrar un nuevo servicio técnico.' 
+              : 'Modifica los datos del registro de mantenimiento.'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px' }}>
               <FormField
                 control={form.control}
                 name="fechaInicio"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Fecha de Inicio</FormLabel>
+                    <FormLabel className="font-bold text-sm">Fecha de Inicio</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" style={inputStyle} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -112,9 +132,9 @@ export const MantenimientoForm = ({ open, onOpenChange, onSubmit, defaultValues,
                 name="fechaFin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Fecha de Fin</FormLabel>
+                    <FormLabel className="font-bold text-sm">Fecha de Fin</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" style={inputStyle} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -127,10 +147,10 @@ export const MantenimientoForm = ({ open, onOpenChange, onSubmit, defaultValues,
               name="tipo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Mantenimiento</FormLabel>
+                  <FormLabel className="font-bold text-sm">Tipo de Mantenimiento</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger style={inputStyle}>
                         <SelectValue placeholder="Seleccione un tipo" />
                       </SelectTrigger>
                     </FormControl>
@@ -149,14 +169,14 @@ export const MantenimientoForm = ({ open, onOpenChange, onSubmit, defaultValues,
               name="idVehiculo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Vehículo</FormLabel>
+                  <FormLabel className="font-bold text-sm">Vehículo</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     value={field.value?.toString()}
                     disabled={loadingVehiculos}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger style={inputStyle}>
                         <SelectValue placeholder={loadingVehiculos ? "Cargando vehículos..." : "Seleccione un vehículo"} />
                       </SelectTrigger>
                     </FormControl>
@@ -181,12 +201,11 @@ export const MantenimientoForm = ({ open, onOpenChange, onSubmit, defaultValues,
               name="observacion"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Observaciones (Opcional)</FormLabel>
+                  <FormLabel className="font-bold text-sm">Observaciones (Opcional)</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Ingrese observaciones adicionales..." 
-                      className="resize-none"
-                      rows={4}
+                      placeholder="Ingrese detalles técnicos o piezas reemplazadas..." 
+                      style={{ ...inputStyle, height: '80px', paddingTop: '10px', resize: 'none' }}
                       {...field} 
                     />
                   </FormControl>
@@ -195,24 +214,23 @@ export const MantenimientoForm = ({ open, onOpenChange, onSubmit, defaultValues,
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter style={{ marginTop: '10px', gap: '12px' }}>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {mode === 'create' ? 'Creando...' : 'Actualizando...'}
-                  </>
-                ) : (
-                  mode === 'create' ? 'Crear' : 'Actualizar'
-                )}
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white' }}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {mode === 'create' ? 'Crear' : 'Guardar'}
               </Button>
             </DialogFooter>
           </form>

@@ -10,146 +10,136 @@ import { FileText, Calendar, Activity, Hash, User, Truck, Tag } from 'lucide-rea
 export const DocumentacionDetailDialog = ({ open, onOpenChange, documentacion }) => {
   if (!documentacion) return null;
 
+  // Estilos de estado consistentes
   const getEstadoColor = (estado) => {
-    if (!estado) return 'bg-gray-100 text-gray-700';
+    if (!estado) return 'bg-gray-100 text-gray-700 border-gray-200';
     const estadoLower = estado.toLowerCase();
-    if (estadoLower === 'vigente') return 'bg-green-100 text-green-700';
-    if (estadoLower === 'vencida') return 'bg-red-100 text-red-700';
-    if (estadoLower === 'por vencer') return 'bg-yellow-100 text-yellow-700';
-    return 'bg-gray-100 text-gray-700';
+    if (estadoLower === 'vigente') return 'bg-green-100 text-green-700 border-green-200';
+    if (estadoLower === 'vencida') return 'bg-red-100 text-red-700 border-red-200';
+    if (estadoLower === 'por vencer') return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    return 'bg-gray-100 text-gray-700 border-gray-200';
+  };
+
+  // Estilo de tarjeta copiado de ChoferDetailDialog
+  const cardStyle = {
+    padding: '20px',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#ffffff',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px'
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Detalles de la Documentación
+      {/* Ajustamos padding y ancho consistente con los demás diálogos de detalle */}
+      <DialogContent style={{ padding: '30px', maxWidth: '550px' }} className="max-h-[85vh] overflow-y-auto">
+        
+        <DialogHeader style={{ marginBottom: '10px' }}>
+          <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+            <FileText className="h-6 w-6" style={{ color: '#592673' }} />
+            Detalles de Documentación
           </DialogTitle>
-          <DialogDescription>
-            Información completa de la documentación
+          <DialogDescription className="text-base">
+            Información técnica y estado de vigencia del documento.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Información de la Documentación */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-gray-900">Información de la Documentación</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500">Tipo</p>
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-gray-400" />
-                  <p className="text-sm font-medium">{documentacion.nombre || 'Sin tipo'}</p>
-                </div>
-              </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          
+          {/* Badge de Estado Principal */}
+          <div>
+            <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold border ${getEstadoColor(documentacion.estado)}`}>
+              {documentacion.estado || 'SIN ESTADO'}
+            </span>
+          </div>
 
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500">Estado</p>
-                <div className="flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-gray-400" />
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor(documentacion.estado)}`}>
-                    {documentacion.estado || 'Sin estado'}
-                  </span>
-                </div>
+          {/* Card: Información del Documento */}
+          <div style={cardStyle}>
+            <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style={{ color: '#592673' }}>
+              <FileText className="h-4 w-4" /> Datos del Registro
+            </h3>
+            
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase">Tipo de Documento</p>
+                <p className="font-medium text-slate-900 text-lg">{documentacion.nombre || '—'}</p>
               </div>
+            </div>
 
-              <div className="space-y-1 col-span-2">
-                <p className="text-xs text-gray-500">Fecha de Vencimiento</p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-400" />
-                  <p className="text-sm">{documentacion.fechaVencimiento || 'Sin fecha'}</p>
-                </div>
+            <div className="grid grid-cols-2 gap-6 pt-2">
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase flex items-center gap-1">
+                  <Calendar className="h-3 w-3" /> Vencimiento
+                </p>
+                <p className="font-medium text-slate-900">{documentacion.fechaVencimiento || '—'}</p>
               </div>
-
-              {documentacion.renovacion && (
-                <div className="space-y-1 col-span-2">
-                  <p className="text-xs text-gray-500">Renovación (días)</p>
-                  <p className="text-sm font-medium">{documentacion.renovacion}</p>
-                </div>
-              )}
+              <div>
+                <p className="text-xs text-slate-500 font-semibold uppercase flex items-center gap-1">
+                  <Activity className="h-3 w-3" /> Renovación
+                </p>
+                <p className="font-medium text-slate-900">
+                  {documentacion.renovacion ? `${documentacion.renovacion} meses` : 'No aplica'}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Detalle */}
-          {/* {documentacion.detalle && (
-            <div className="space-y-3 pt-3 border-t">
-              <h3 className="text-sm font-semibold text-gray-900">Detalle</h3>
-              <p className="text-sm bg-gray-50 p-3 rounded-md border border-gray-200">
-                {documentacion.detalle}
-              </p>
-            </div>
-          )} */}
+          {/* Card: Entidad Asociada (Dinámica para Chofer o Vehículo) */}
+          {(documentacion.chofer || documentacion.vehiculo) && (
+            <div style={cardStyle}>
+              <h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style={{ color: '#592673' }}>
+                {documentacion.tipoEntidad === 'CHOFER' ? <User className="h-4 w-4" /> : <Truck className="h-4 w-4" />}
+                Asociado a {documentacion.tipoEntidad === 'CHOFER' ? 'Chofer' : 'Vehículo'}
+              </h3>
 
-          {/* Información de la Entidad Asociada */}
-          {documentacion.tipoEntidad === 'CHOFER' && documentacion.chofer && (
-            <div className="space-y-3 pt-3 border-t">
-              <h3 className="text-sm font-semibold text-gray-900">Chofer Asociado</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500">Nombre</p>
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-gray-400" />
-                    <p className="text-sm font-medium">
+              {documentacion.tipoEntidad === 'CHOFER' && documentacion.chofer && (
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-xs text-slate-500 font-semibold uppercase">Nombre Completo</p>
+                    <p className="font-medium text-slate-900">
                       {documentacion.chofer.persona
                         ? `${documentacion.chofer.persona.nombre} ${documentacion.chofer.persona.apellido}`
-                        : 'Sin nombre'}
+                        : '—'}
                     </p>
                   </div>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500">DNI</p>
-                  <p className="text-sm">{documentacion.chofer.dni || 'Sin DNI'}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {documentacion.tipoEntidad === 'VEHICULO' && documentacion.vehiculo && (
-            <div className="space-y-3 pt-3 border-t">
-              <h3 className="text-sm font-semibold text-gray-900">Vehículo Asociado</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500">Patente</p>
-                  <div className="flex items-center gap-2">
-                    <Tag className="h-4 w-4 text-gray-400" />
-                    <p className="text-sm font-medium">{documentacion.vehiculo.patente || 'Sin patente'}</p>
+                  <div>
+                    <p className="text-xs text-slate-500 font-semibold uppercase flex items-center gap-1">
+                      <Hash className="h-3 w-3" /> DNI
+                    </p>
+                    <p className="font-medium font-mono text-slate-900">{documentacion.chofer.dni || '—'}</p>
                   </div>
                 </div>
+              )}
 
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500">Marca y Modelo</p>
-                  <div className="flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-gray-400" />
-                    <p className="text-sm">
+              {documentacion.tipoEntidad === 'VEHICULO' && documentacion.vehiculo && (
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-xs text-slate-500 font-semibold uppercase flex items-center gap-1">
+                      <Tag className="h-3 w-3" /> Patente
+                    </p>
+                    <p className="font-medium font-mono text-slate-900 uppercase">
+                      {documentacion.vehiculo.patente || '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-semibold uppercase">Vehículo</p>
+                    <p className="font-medium text-slate-900">
                       {documentacion.vehiculo.marca} {documentacion.vehiculo.modelo}
                     </p>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
-          {/* Información del Sistema */}
-          {/* <div className="space-y-3 pt-3 border-t">
-            <h3 className="text-sm font-semibold text-gray-900">Información del Sistema</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500">ID Documentación</p>
-                <div className="flex items-center gap-2">
-                  <Hash className="h-4 w-4 text-gray-400" />
-                  <p className="text-sm font-mono">{documentacion.idDocumentacion || 'Sin ID'}</p>
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500">Tipo Entidad</p>
-                <p className="text-sm font-medium">{documentacion.tipoEntidad || 'Sin tipo'}</p>
-              </div>
-            </div>
-          </div> */}
+          {/* Información Técnica del ID (Sutil al final) */}
+          <div className="px-1 flex justify-between items-center opacity-50">
+             <p className="text-[10px] text-slate-500 font-mono uppercase tracking-tighter">
+               ID-DOC: {documentacion.idDocumentacion || 'N/A'}
+             </p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

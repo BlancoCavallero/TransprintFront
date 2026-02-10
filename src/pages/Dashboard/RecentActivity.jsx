@@ -5,10 +5,10 @@ export function RecentActivity({ activities }) {
     <Card className="flex-1">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-semibold">
-          Actividad Reciente
+          Mantenimientos
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Últimas actividades del sistema
+          
         </p>
       </CardHeader>
 

@@ -34,17 +34,27 @@ export const DocumentacionTable = ({ columns, data }) => {
       sorting,
       columnFilters,
     },
+    // Mantenemos el default de 10 o el que prefieras
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
+    <div className="w-full space-y-4">
+      {/* Contenedor de tabla con ancho fijo y sin overflow innecesario */}
+      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+        <Table style={{ tableLayout: 'auto', width: '100%' }}>
+          <TableHeader className="bg-slate-50/50">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent border-b border-slate-200">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead 
+                    key={header.id} 
+                    className="text-slate-500 font-bold text-[10px] uppercase tracking-wider h-10 px-3"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -61,10 +71,10 @@ export const DocumentacionTable = ({ columns, data }) => {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="px-3 py-2.5 text-xs text-slate-700">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -77,7 +87,7 @@ export const DocumentacionTable = ({ columns, data }) => {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-slate-400 italic text-sm"
                 >
                   No hay documentaciones registradas.
                 </TableCell>
@@ -87,25 +97,32 @@ export const DocumentacionTable = ({ columns, data }) => {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-end space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
-      </div>
+      {/* Paginación Condicional: Solo se muestra si hay más de una página */}
+      {table.getPageCount() > 1 && (
+        <div className="flex items-center justify-end space-x-2 pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="text-xs h-8"
+          >
+            Anterior
+          </Button>
+          <div className="text-xs text-slate-500 font-medium">
+            Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="text-xs h-8"
+          >
+            Siguiente
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

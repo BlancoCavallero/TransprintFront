@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Receipt } from 'lucide-react'; // Agregué Receipt para el icono del título
 import { useEffect } from 'react';
 import { getGastoSchema } from './gastoSchema';
 
@@ -36,7 +36,7 @@ export const GastoForm = ({
   defaultValues,
   isLoading = false,
   mode = 'create',
-  idViaje, // ID del viaje al que pertenece el gasto
+  idViaje,
 }) => {
   const schema = getGastoSchema(mode);
 
@@ -44,7 +44,7 @@ export const GastoForm = ({
     resolver: zodResolver(schema),
     defaultValues: {
       detalle: '',
-      monto: 0, // Mantener como número, no cadena vacía
+      monto: 0,
       tipo: '',
       idViaje: idViaje || '',
     },
@@ -82,27 +82,48 @@ export const GastoForm = ({
     }
   };
 
+  // Estilos traídos de ClienteForm
+  const inputStyle = {
+    paddingLeft: '15px',
+    paddingRight: '15px',
+    height: '42px',
+    borderRadius: '8px',
+    border: '1px solid #cbd5e1'
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Registrar Gasto' : 'Editar Gasto'}</DialogTitle>
+      <DialogContent 
+        style={{ 
+          padding: '30px', 
+          maxWidth: '500px',
+        }} 
+        className="max-h-[85vh] overflow-y-auto"
+      >
+        <DialogHeader style={{ marginBottom: '20px' }}>
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            <Receipt className="h-5 w-5" style={{ color: '#592673' }} />
+            {mode === 'create' ? 'Registrar Gasto' : 'Editar Gasto'}
+          </DialogTitle>
           <DialogDescription>
-            {mode === 'create' ? 'Completa los datos para registrar un nuevo gasto.' : 'Modifica los datos del gasto.'}
+            {mode === 'create' 
+              ? 'Completa los datos para registrar un nuevo gasto en el viaje.' 
+              : 'Modifica los datos del gasto registrado.'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            
             <FormField
               control={form.control}
               name="tipo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Gasto</FormLabel>
+                  <FormLabel className="font-bold text-sm">Tipo de Gasto</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger style={inputStyle}>
                         <SelectValue placeholder="Seleccione un tipo" />
                       </SelectTrigger>
                     </FormControl>
@@ -122,10 +143,11 @@ export const GastoForm = ({
               name="monto"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Monto</FormLabel>
+                  <FormLabel className="font-bold text-sm">Monto</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
+                      style={inputStyle}
                       placeholder="Ej: 100.50" 
                       {...field}
                       value={field.value === 0 ? '' : field.value}
@@ -142,9 +164,10 @@ export const GastoForm = ({
               name="detalle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Detalle</FormLabel>
+                  <FormLabel className="font-bold text-sm">Detalle</FormLabel>
                   <FormControl>
                     <Input 
+                      style={inputStyle}
                       placeholder="Ej: Comida, Carga de combustible..." 
                       {...field} 
                     />
@@ -154,24 +177,23 @@ export const GastoForm = ({
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter style={{ marginTop: '10px', gap: '12px' }}>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
+                style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {mode === 'create' ? 'Registrando...' : 'Actualizando...'}
-                  </>
-                ) : (
-                  mode === 'create' ? 'Registrar' : 'Actualizar'
-                )}
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                style={{ height: '40px', padding: '0 25px', backgroundColor: '#592673', color: 'white' }}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {mode === 'create' ? 'Registrar' : 'Guardar'}
               </Button>
             </DialogFooter>
           </form>

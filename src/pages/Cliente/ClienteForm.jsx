@@ -86,7 +86,6 @@ export const ClienteForm = ({
     }
   }, [open, defaultValues, mode, form]);
 
-  // Aplicamos la lógica de ChoferForm: esperar el result.success para cerrar
   const handleSubmit = async (data) => {
     const result = await onSubmit(data);
     if (result?.success) {
@@ -105,7 +104,18 @@ export const ClienteForm = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent style={{ padding: '30px', maxWidth: '550px' }} className="max-h-[90vh] overflow-y-auto">
+      {/* Ajuste de Centrado:
+          - Eliminamos estilos de posicionamiento manual (top/margin).
+          - max-h-[80vh] asegura que el modal no sea más alto que el 80% de la pantalla.
+          - La clase overflow-y-auto permitirá scroll interno si el contenido es mucho.
+      */}
+      <DialogContent 
+        style={{ 
+          padding: '30px', 
+          maxWidth: '550px',
+        }} 
+        className="max-h-[85vh] overflow-y-auto"
+      >
         <DialogHeader style={{ marginBottom: '20px' }}>
           <DialogTitle className="text-xl font-bold">
             {mode === 'create' ? 'Crear Nuevo Cliente' : 'Editar Cliente'}

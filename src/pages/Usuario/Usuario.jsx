@@ -24,14 +24,13 @@ export const Usuario = () => {
     refetch,
   } = useUsuario();
 
-
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedUsuario, setSelectedUsuario] = useState(null);
 
   const handleEditClick = (item) => {
-     setSelectedUsuario({ ...item }); 
+    setSelectedUsuario({ ...item }); 
     setIsEditDialogOpen(true);
   };
 
@@ -90,7 +89,7 @@ export const Usuario = () => {
 
   const columns = createUsuarioColumns(handleEditClick, handleDeleteClick);
 
-  if (loading) {
+  if (loading && !usuarios.length) {
     return (
       <div className="flex items-center justify-center h-64">
         <RefreshCw className="h-8 w-8 animate-spin text-gray-500" />
@@ -99,20 +98,28 @@ export const Usuario = () => {
   }
 
   return (
-    <div className="">
-      <div className="flex items-center justify-between mb-6">
+    <div style={{ padding: '20px 30px', width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Usuarios</h1>
           <p className="text-muted-foreground">
             Gestiona todos tus usuarios desde aquí
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={refetch} disabled={loading}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Button 
+            variant="outline" 
+            onClick={() => refetch()} 
+            disabled={loading}
+            style={{ height: '40px', padding: '0 20px', border: '1px solid #cbd5e1' }}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Actualizar
           </Button>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)}
+            style={{ backgroundColor: '#592673', color: 'white', height: '40px', padding: '0 20px', border: 'none' }}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Nuevo Usuario
           </Button>
@@ -120,14 +127,16 @@ export const Usuario = () => {
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <UsuarioTable columns={columns} data={usuarios} />
+      <div className="w-full">
+        <UsuarioTable columns={columns} data={usuarios} />
+      </div>
 
       <UsuarioForm
         open={isCreateDialogOpen}
@@ -151,6 +160,8 @@ export const Usuario = () => {
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
         isLoading={loadingDelete}
+        title="Eliminar Usuario"
+        confirmText="Eliminar"
         description={`¿Estás seguro de eliminar a ${selectedUsuario?.nombre_completo || selectedUsuario?.username || "este usuario"}? Esta acción no se puede deshacer.`}
       />
     </div>
