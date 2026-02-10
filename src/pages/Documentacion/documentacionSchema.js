@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Tipos de documentación según la entidad
-export const TIPOS_DOC_CHOFER = ['APTO FISICO', 'CARNET DE CONDUCIR', 'OTRO'];
+export const TIPOS_DOC_CHOFER = ['APTO FISICO', 'CARNET', 'OTRO'];
 export const TIPOS_DOC_VEHICULO = ['VTV', 'SEGURO', 'OTRO'];
 
 // Validación de archivo PDF
