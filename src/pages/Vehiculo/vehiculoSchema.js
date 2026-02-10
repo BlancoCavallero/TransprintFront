@@ -31,9 +31,9 @@ const vehiculoBaseSchema = z.object({
   //   errorMap: () => ({ message: "Debe seleccionar un estado válido" }),
   // }),
 
-  tipo: z.enum(["Camion", "Acoplado"], {
+  tipo: z.enum(["LIGERO", "MEDIANO", "PESADO", "TERAPESADO"], {
     errorMap: () => ({
-      message: "Debe seleccionar un tipo válido (Camión o Acoplado)",
+      message: "Debe seleccionar un tipo válido (Ligero, Mediano, Pesado o Terapesado)",
     }),
   }),
 });

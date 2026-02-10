@@ -55,8 +55,10 @@ export const VehiculoForm = ({
       const normalizeTipo = (tipo) => {
         if (!tipo) return '';
         const tipoUpper = tipo.toUpperCase();
-        if (tipoUpper === 'CAMION') return 'Camion';
-        if (tipoUpper === 'ACOPLADO') return 'Acoplado';
+        if (tipoUpper === 'LIGERO') return 'Ligero';
+        if (tipoUpper === 'MEDIANO') return 'Mediano';
+        if (tipoUpper === 'PESADO') return 'Pesado';
+        if (tipoUpper === 'TERAPESADO') return 'Terapesado';
         return tipo;
       };
 
@@ -184,8 +186,11 @@ export const VehiculoForm = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Camion">Camión</SelectItem>
-                        <SelectItem value="Acoplado">Acoplado</SelectItem>
+                        <SelectItem value="LIGERO">Ligero</SelectItem>
+                        <SelectItem value="MEDIANO">Mediano</SelectItem>
+                        <SelectItem value="PESADO">Pesado</SelectItem>
+                        <SelectItem value="TERAPESADO">Terapesado</SelectItem>
+
                       </SelectContent>
                     </Select>
                     <FormMessage />

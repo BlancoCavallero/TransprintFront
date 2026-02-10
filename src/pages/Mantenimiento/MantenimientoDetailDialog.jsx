@@ -22,16 +22,20 @@ export const MantenimientoDetailDialog = ({ open, onOpenChange, mantenimiento })
   const getTipoVehiculoColor = (tipo) => {
     if (!tipo) return 'bg-gray-100 text-gray-700 border-gray-200';
     const tipoLower = tipo.toLowerCase();
-    if (tipoLower === 'camion') return 'bg-blue-100 text-blue-700 border-blue-200';
-    if (tipoLower === 'acoplado') return 'bg-purple-100 text-purple-700 border-purple-200';
+    if (tipoLower === 'ligero') return 'bg-blue-100 text-blue-700 border-blue-200';
+    if (tipoLower === 'mediano') return 'bg-purple-100 text-purple-700 border-purple-200';
+    if (tipoLower === 'pesado') return 'bg-purple-100 text-purple-700 border-purple-200';
+    if (tipoLower === 'terapesado') return 'bg-purple-100 text-purple-700 border-purple-200';
     return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
   const getTipoVehiculoLabel = (tipo) => {
     if (!tipo) return 'Sin tipo';
     const tipoLower = tipo.toLowerCase();
-    if (tipoLower === 'camion') return 'Camión';
-    if (tipoLower === 'acoplado') return 'Acoplado';
+    if (tipoLower === 'ligero') return 'Ligero';
+    if (tipoLower === 'mediano') return 'Mediano';
+    if (tipoLower === 'pesado') return 'Pesado';
+    if (tipoLower === 'terapesado') return 'Terapesado';
     return tipo;
   };
 

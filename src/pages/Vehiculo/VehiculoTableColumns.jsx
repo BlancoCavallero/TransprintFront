@@ -63,16 +63,22 @@ export const createVehiculoColumns = (onEdit, onDelete, onView) => [
     cell: ({ row }) => {
       const tipo = row.original.tipo;
       const tipoLower = tipo?.toLowerCase() || '';
-      const tipoLabel = tipoLower === 'camion' ? 'Camión' : tipoLower === 'acoplado' ? 'Acoplado' : tipo || 'Sin tipo';
+    //const tipoLabel = tipoLower === 'camion' ? 'Camión' : tipoLower === 'acoplado' ? 'Acoplado' : tipo || 'Sin tipo';
+      const tipoLabel = tipoLower === 'ligero' ? 'Ligero' : tipoLower === 'mediano' ? 'Mediano' : tipoLower === 'pesado' ? 'Pesado' : tipoLower === 'terapesado' ? 'TeraPesado' : tipo || 'Sin tipo';
       
+      //marca de agua
       return (
         <div className="flex items-center gap-2">
           <Truck className="h-4 w-4 text-gray-500" />
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            tipoLower === 'camion' 
+            tipoLower === 'ligero' 
               ? 'bg-blue-100 text-blue-700' 
-              : tipoLower === 'acoplado'
+              : tipoLower === 'mediano'
               ? 'bg-purple-100 text-purple-700'
+              : tipoLower === 'pesado'
+              ? 'bg-indigo-100 text-indigo-700'
+              : tipoLower === 'terapesado'
+              ? 'bg-teal-100 text-teal-700'
               : 'bg-gray-100 text-gray-700'
           }`}>
             {tipoLabel}

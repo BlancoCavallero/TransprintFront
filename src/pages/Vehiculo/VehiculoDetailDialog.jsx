@@ -58,8 +58,10 @@ export const VehiculoDetailDialog = ({ open, onOpenChange, vehiculo, onReactivar
 
   const getTipoColor = (tipo) => {
     const tipoLower = tipo?.toLowerCase();
-    if (tipoLower === 'camion') return 'bg-blue-100 text-blue-700 border-blue-200';
-    if (tipoLower === 'acoplado') return 'bg-purple-100 text-purple-700 border-purple-200';
+    if (tipoLower === 'ligero') return 'bg-blue-100 text-blue-700 border-blue-200';
+    if (tipoLower === 'mediano') return 'bg-purple-100 text-purple-700 border-purple-200';
+    if (tipoLower === 'pesado') return 'bg-blue-100 text-blue-700 border-blue-200';
+    if (tipoLower === 'terapesado') return 'bg-purple-100 text-purple-700 border-purple-200';
     return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
