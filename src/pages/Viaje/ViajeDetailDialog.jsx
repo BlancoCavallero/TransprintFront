@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -5,187 +6,359 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { 
-  MapPin, 
-  Calendar, 
-  User, 
-  Truck, 
-  Navigation, 
-  AlertCircle,
-  Clock
-} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { User, Truck, MapPin, Calendar, DollarSign, Activity, Hash, FileText, Tag } from 'lucide-react';
+import { useGastos } from '../../hooks/entities/useGastos';
+import { GastoForm } from '../Gasto/GastoForm';
+import { GastoTable } from '../Gasto/GastoTable';
+import { GastoDetailDialog } from '../Gasto/GastoDetailDialog';
+import { createGastoColumns } from '../Gasto/GastoTableColumns';
+import { DeleteConfirmationDialog } from '@/components/Alert/DeleteConfirmationDialog';
+import { toast } from 'sonner';
 
 export const ViajeDetailDialog = ({ open, onOpenChange, viaje }) => {
+  const [activeTab, setActiveTab] = useState('detalles');
+  const [isCreateGastoOpen, setIsCreateGastoOpen] = useState(false);
+  const [isEditGastoOpen, setIsEditGastoOpen] = useState(false);
+  const [isDeleteGastoOpen, setIsDeleteGastoOpen] = useState(false);
+  const [isDetailGastoOpen, setIsDetailGastoOpen] = useState(false);
+  const [selectedGasto, setSelectedGasto] = useState(null);
+
+  const {
+    gastos,
+    loading: loadingGastos,
+    loadingCreate,
+    loadingUpdate,
+    loadingDelete,
+    handleCreate: handleCreateGasto,
+    handleUpdate: handleUpdateGasto,
+    handleDelete: handleDeleteGasto,
+    refetch: refetchGastos,
+  } = useGastos(viaje?.idViaje);
+
+  // Refrescar gastos cuando cambia el viaje
+  useEffect(() => {
+    if (open && viaje?.idViaje) {
+      refetchGastos();
+    }
+  }, [open, viaje?.idViaje, refetchGastos]);
+
   if (!viaje) return null;
 
-  const esCancelado = viaje.estado === 'CANCELADO';
-
   const getEstadoColor = (estado) => {
-    switch (estado) {
-      case 'PENDIENTE': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'EN_CURSO': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'FINALIZADO': return 'bg-green-100 text-green-700 border-green-200';
-      case 'CANCELADO': return 'bg-red-100 text-red-700 border-red-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    if (!estado) return 'bg-gray-100 text-gray-700';
+    const estadoUpper = estado.toUpperCase();
+    switch (estadoUpper) {
+      case 'PROGRAMADO':
+        return 'bg-blue-100 text-blue-700';
+      case 'EN_CURSO':
+      case 'EN CURSO':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'FINALIZADO':
+        return 'bg-green-100 text-green-700';
+      case 'CANCELADO':
+        return 'bg-red-100 text-red-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '—';
-    return new Date(dateString).toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
+  const handleViewGasto = (gasto) => {
+    setSelectedGasto({ ...gasto });
+    setIsDetailGastoOpen(true);
   };
 
-  const cardStyle = {
-    padding: '16px',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    backgroundColor: '#ffffff',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
+  const handleEditGasto = (gasto) => {
+    setSelectedGasto({ ...gasto });
+    setIsEditGastoOpen(true);
   };
+
+  const handleDeleteGastoClick = (gasto) => {
+    setSelectedGasto({ ...gasto });
+    setIsDeleteGastoOpen(true);
+  };
+
+  const handleCreateGastoSubmit = async (data) => {
+    const result = await handleCreateGasto(data);
+    if (result.success) {
+      setIsCreateGastoOpen(false);
+      toast.success('Gasto registrado exitosamente', {
+        description: `El gasto de tipo "${data.tipo}" ha sido agregado al viaje.`
+      });
+    } else {
+      toast.error('Error al registrar gasto', {
+        description: result.error || 'Ocurrió un error al intentar registrar el gasto.'
+      });
+    }
+    return result;
+  };
+
+  const handleUpdateGastoSubmit = async (data) => {
+    if (!selectedGasto) return;
+    const result = await handleUpdateGasto(
+      selectedGasto.idGasto || selectedGasto.id,
+      data,
+      selectedGasto
+    );
+    if (result.success) {
+      setIsEditGastoOpen(false);
+      setSelectedGasto(null);
+      toast.success('Gasto actualizado exitosamente', {
+        description: `Los datos del gasto han sido actualizados.`
+      });
+    } else {
+      toast.error('Error al actualizar gasto', {
+        description: result.error || 'Ocurrió un error al intentar actualizar el gasto.'
+      });
+    }
+    return result;
+  };
+
+  const handleDeleteGastoConfirm = async () => {
+    if (!selectedGasto) return;
+    const result = await handleDeleteGasto(selectedGasto.idGasto || selectedGasto.id);
+    if (result.success) {
+      setIsDeleteGastoOpen(false);
+      setSelectedGasto(null);
+      toast.success('Gasto eliminado exitosamente', {
+        description: `El gasto de tipo "${selectedGasto.tipo}" ha sido eliminado.`
+      });
+    } else {
+      toast.error('Error al eliminar gasto', {
+        description: result.error || 'Ocurrió un error al intentar eliminar el gasto.'
+      });
+    }
+  };
+
+  const gastosColumns = createGastoColumns(
+    handleEditGasto,
+    handleDeleteGastoClick,
+    handleViewGasto
+  );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent style={{ padding: '24px', maxWidth: '500px' }} className="max-h-[90vh] overflow-y-auto border-none">
-        
-        <DialogHeader style={{ marginBottom: '16px' }}>
-          <DialogTitle className="text-xl font-bold flex items-center gap-3">
-            <Navigation className="h-5 w-5" style={{ color: '#592673' }} />
-            Detalles del Viaje
-          </DialogTitle>
-          <DialogDescription className="text-sm">
-            Resumen de la operación logística.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Detalles del Viaje
+            </DialogTitle>
+            <DialogDescription>
+              Información completa del viaje y gestión de gastos
+            </DialogDescription>
+          </DialogHeader>
 
-        {viaje.estado && (
-          <div style={{ marginBottom: '16px' }}>
-            <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border ${getEstadoColor(viaje.estado)}`}>
-              {viaje.estado}
-            </span>
-          </div>
-        )}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="detalles">Detalles del Viaje</TabsTrigger>
+              <TabsTrigger value="gastos">Gastos ({gastos.length})</TabsTrigger>
+            </TabsList>
 
-        {esCancelado && (
-          <div style={{ marginBottom: '20px', padding: '14px', backgroundColor: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '12px' }} className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
-            <div className="flex-1">
-              <h4 className="text-sm font-bold text-red-900">Viaje Cancelado</h4>
-              <p className="text-xs text-red-700 mt-1 leading-relaxed">
-                {viaje.motivoCancelacion || 'Sin motivo especificado'}
-              </p>
-            </div>
-          </div>
-        )}
+            <TabsContent value="detalles" className="space-y-6 mt-4">
+              {/* Información del Viaje */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-900">Información del Viaje</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500">Estado</p>
+                    <div className="flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-gray-400" />
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor(viaje.estado)}`}>
+                        {viaje.estado || 'Sin estado'}
+                      </span>
+                    </div>
+                  </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          
-          {/* Personal */}
-          <div style={cardStyle}>
-            <h3 className="font-bold text-[11px] uppercase tracking-wider flex items-center gap-2" style={{ color: '#592673' }}>
-              <User className="h-3.5 w-3.5" /> Asignación
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-[10px] text-slate-500 font-semibold uppercase">Cliente</p>
-                <p className="text-sm font-medium text-slate-900 truncate">
-                  {viaje.cliente?.razonSocial || `${viaje.cliente?.persona?.nombre} ${viaje.cliente?.persona?.apellido}` || '—'}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-slate-500 font-semibold uppercase">Chofer</p>
-                <p className="text-sm font-medium text-slate-900 truncate">
-                  {viaje.chofer?.persona?.nombre} {viaje.chofer?.persona?.apellido || '—'}
-                </p>
-              </div>
-            </div>
-          </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500">Precio</p>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-gray-400" />
+                      <p className="text-sm font-medium">${viaje.precio?.toLocaleString('es-ES') || 0}</p>
+                    </div>
+                  </div>
 
-          {/* Vehículo y Ruta (Datos completados) */}
-          <div style={cardStyle}>
-            <div className="flex justify-between items-start border-b pb-2 mb-1 border-slate-50">
-               <div>
-                  <p className="text-[10px] text-slate-500 font-semibold uppercase flex items-center gap-1 mb-1">
-                    <Truck className="h-3 w-3" /> Vehículo
-                  </p>
-                  <p className="text-sm font-bold text-slate-900">
-                    {viaje.vehiculo?.patente || 'S/D'} 
-                    <span className="font-normal text-slate-500"> - {viaje.vehiculo?.marca} {viaje.vehiculo?.modelo}</span>
-                  </p>
-               </div>
-               <div className="text-right">
-                  <p className="text-[10px] text-slate-500 font-semibold uppercase mb-1">Distancia</p>
-                  <p className="text-sm font-bold text-slate-900">{viaje.kilometros || 0} km</p>
-               </div>
-            </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500">Fecha Inicio</p>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      <p className="text-sm">{viaje.fechaInicio ? new Date(viaje.fechaInicio).toLocaleDateString('es-ES') : 'Sin fecha'}</p>
+                    </div>
+                  </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-1">
-              <div>
-                <p className="text-[10px] text-slate-500 font-semibold uppercase flex items-center gap-1"><MapPin className="h-2.5 w-2.5"/> Origen</p>
-                <p className="text-xs font-medium text-slate-700 italic truncate">
-                    {viaje.localidadOrigen?.localidad}, {viaje.localidadOrigen?.provincia}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-slate-500 font-semibold uppercase flex items-center gap-1"><MapPin className="h-2.5 w-2.5"/> Destino</p>
-                <p className="text-xs font-medium text-slate-700 italic truncate">
-                    {viaje.localidadDestino?.localidad}, {viaje.localidadDestino?.provincia}
-                </p>
-              </div>
-            </div>
-          </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500">Fecha Fin</p>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      <p className="text-sm">{viaje.fechaFin ? new Date(viaje.fechaFin).toLocaleDateString('es-ES') : 'Sin fecha'}</p>
+                    </div>
+                  </div>
 
-          {/* Fechas y Precio */}
-          <div style={{ ...cardStyle, backgroundColor: '#f8fafc' }}>
-            <div className="grid grid-cols-2 gap-4 items-center">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-[11px] text-slate-600">
-                  <Calendar className="h-3 w-3" /> {formatDate(viaje.fechaInicio)}
-                </div>
-                <div className="flex items-center gap-2 text-[11px] text-slate-600">
-                  <Clock className="h-3 w-3" /> {formatDate(viaje.fechaFin)}
+                  <div className="space-y-1 col-span-2">
+                    <p className="text-xs text-gray-500">Kilómetros</p>
+                    <p className="text-sm font-medium">{viaje.kilometros || 0} km</p>
+                  </div>
                 </div>
               </div>
-              <div className="text-right border-l border-slate-200 pl-4">
-                <p className="text-[10px] text-slate-500 font-semibold uppercase mb-1">Importe</p>
-                <p className="text-lg font-bold text-[#592673]">
-                  ${Number(viaje.precio).toLocaleString('es-AR')}
-                </p>
+
+              {/* Información del Cliente */}
+              {viaje.cliente && (
+                <div className="space-y-3 pt-3 border-t">
+                  <h3 className="text-sm font-semibold text-gray-900">Información del Cliente</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Razón Social / Nombre</p>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-gray-400" />
+                        <p className="text-sm font-medium">
+                          {viaje.cliente.razonSocial || 
+                           (viaje.cliente.persona ? `${viaje.cliente.persona.nombre} ${viaje.cliente.persona.apellido}` : 'Sin nombre')}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Tipo</p>
+                      <p className="text-sm">{viaje.cliente.tipo || 'Sin tipo'}</p>
+                    </div>
+
+                    {viaje.cliente.correo && (
+                      <div className="space-y-1 col-span-2">
+                        <p className="text-xs text-gray-500">Correo</p>
+                        <p className="text-sm">{viaje.cliente.correo}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Información del Chofer */}
+              {viaje.chofer && (
+                <div className="space-y-3 pt-3 border-t">
+                  <h3 className="text-sm font-semibold text-gray-900">Información del Chofer</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Nombre</p>
+                      <p className="text-sm font-medium">
+                        {viaje.chofer.persona ? `${viaje.chofer.persona.nombre} ${viaje.chofer.persona.apellido}` : 'Sin nombre'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">DNI</p>
+                      <p className="text-sm">{viaje.chofer.dni || 'Sin DNI'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Información del Vehículo */}
+              {viaje.vehiculo && (
+                <div className="space-y-3 pt-3 border-t">
+                  <h3 className="text-sm font-semibold text-gray-900">Información del Vehículo</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Patente</p>
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-gray-400" />
+                        <p className="text-sm font-medium">{viaje.vehiculo.patente || 'Sin patente'}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-500">Marca y Modelo</p>
+                      <div className="flex items-center gap-2">
+                        <Truck className="h-4 w-4 text-gray-400" />
+                        <p className="text-sm">{viaje.vehiculo.marca} {viaje.vehiculo.modelo}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Observaciones */}
+              {viaje.observaciones && (
+                <div className="space-y-3 pt-3 border-t">
+                  <h3 className="text-sm font-semibold text-gray-900">Observaciones</h3>
+                  <div className="flex items-start gap-2">
+                    <FileText className="h-4 w-4 text-gray-400 mt-0.5" />
+                    <p className="text-sm bg-gray-50 p-3 rounded-md border border-gray-200 flex-1">
+                      {viaje.observaciones}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Motivo Cancelación */}
+              {viaje.motivoCancelacion && (
+                <div className="space-y-3 pt-3 border-t">
+                  <h3 className="text-sm font-semibold text-red-900">Motivo de Cancelación</h3>
+                  <p className="text-sm bg-red-50 p-3 rounded-md border border-red-200">
+                    {viaje.motivoCancelacion}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="gastos" className="space-y-4 mt-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Gastos del Viaje ({gastos.length})
+                </h3>
+                <Button onClick={() => setIsCreateGastoOpen(true)} size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Registrar Gasto
+                </Button>
               </div>
-            </div>
-          </div>
 
-          {viaje.observaciones && (
-            <div className="px-1">
-              <p className="text-[10px] text-slate-400 font-semibold uppercase mb-1">Observaciones</p>
-              <p className="text-xs text-slate-600 italic leading-snug">"{viaje.observaciones}"</p>
-            </div>
-          )}
-        </div>
+              {loadingGastos ? (
+                <div className="flex items-center justify-center h-32">
+                  <p className="text-sm text-gray-500">Cargando gastos...</p>
+                </div>
+              ) : (
+                <GastoTable columns={gastosColumns} data={gastos} />
+              )}
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
 
-        {/* Botón de cerrar ajustado */}
-        <div className="mt-8 flex justify-end">
-          <Button 
-            onClick={() => onOpenChange(false)}
-            className="rounded-md font-bold text-xs uppercase tracking-widest shadow-md transition-all hover:opacity-90"
-            style={{ 
-              backgroundColor: '#592673', 
-              color: 'white',
-              paddingLeft: '40px',
-              paddingRight: '40px',
-              height: '40px'
-            }}
-          >
-            Cerrar
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* Diálogos de Gastos */}
+      <GastoForm
+        open={isCreateGastoOpen}
+        onOpenChange={setIsCreateGastoOpen}
+        onSubmit={handleCreateGastoSubmit}
+        isLoading={loadingCreate}
+        mode="create"
+        idViaje={viaje?.idViaje}
+      />
+
+      <GastoForm
+        open={isEditGastoOpen}
+        onOpenChange={setIsEditGastoOpen}
+        onSubmit={handleUpdateGastoSubmit}
+        defaultValues={selectedGasto}
+        isLoading={loadingUpdate}
+        mode="edit"
+        idViaje={viaje?.idViaje}
+      />
+
+      <GastoDetailDialog
+        open={isDetailGastoOpen}
+        onOpenChange={setIsDetailGastoOpen}
+        gasto={selectedGasto}
+      />
+
+      <DeleteConfirmationDialog
+        open={isDeleteGastoOpen}
+        onOpenChange={setIsDeleteGastoOpen}
+        onConfirm={handleDeleteGastoConfirm}
+        isLoading={loadingDelete}
+        description={`¿Estás seguro de eliminar el gasto de tipo "${selectedGasto?.tipo}"? Esta acción no se puede deshacer.`}
+      />
+    </>
   );
 };
