@@ -58,13 +58,16 @@ export const createClienteSchema = z.object({
       "El teléfono solo puede contener números, espacios, guiones, + y paréntesis",
     ),
 
-  idLocalidad: z
-    .number({
-      required_error: "La localidad es requerida",
-      invalid_type_error: "Selecciona una localidad válida",
-    })
-    .int("Selecciona una localidad válida")
-    .positive("Selecciona una localidad válida"),
+  idLocalidad: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : Number(val)),
+    z
+      .number({
+        required_error: "La localidad es requerida",
+        invalid_type_error: "Selecciona una localidad válida",
+      })
+      .int("Selecciona una localidad válida")
+      .positive("Selecciona una localidad válida")
+  ),
 
   observaciones: z
     .string()

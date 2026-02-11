@@ -11,11 +11,13 @@ const mantenimientoBaseSchema = z.object({
     .min(1, "La fecha de fin es requerida")
     .regex(/^\d{4}-\d{2}-\d{2}$/, "El formato de fecha debe ser YYYY-MM-DD"),
 
-  tipo: z.enum(["Preventivo", "Correctivo"], {
-    errorMap: () => ({
-      message: "Debe seleccionar un tipo válido (Preventivo o Correctivo)",
-    }),
-  }),
+  tipo: z
+    .string()
+    .min(1, "Debe seleccionar un tipo de mantenimiento")
+    .refine(
+      (value) => ["Preventivo", "Correctivo"].includes(value),
+      "Debe seleccionar un tipo de mantenimiento válido"
+    ),
 
   observacion: z
     .string()

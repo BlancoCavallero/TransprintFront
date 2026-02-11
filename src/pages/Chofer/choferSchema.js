@@ -6,15 +6,18 @@ import * as z from "zod";
  */
 
 export const createChoferSchema = z.object({
-  dni: z
-    .number({
-      required_error: "El DNI es requerido",
-      invalid_type_error: "El DNI debe ser un número",
-    })
-    .int("El DNI debe ser un número entero")
-    .positive("El DNI debe ser positivo")
-    .min(1000000, "El DNI debe tener al menos 7 dígitos")
-    .max(99999999, "El DNI no puede exceder 8 dígitos"),
+  dni: z.preprocess(
+    (val) => (val === "" || val === null ? undefined : Number(val)),
+    z
+      .number({
+        required_error: "El DNI es requerido",
+        invalid_type_error: "El DNI debe ser un número",
+      })
+      .int("El DNI debe ser un número entero")
+      .positive("El DNI debe ser positivo")
+      .min(1000000, "El DNI debe tener al menos 7 dígitos")
+      .max(99999999, "El DNI no puede exceder 8 dígitos")
+  ),
 
   nombre: z
     .string()

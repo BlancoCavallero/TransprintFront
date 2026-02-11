@@ -31,11 +31,13 @@ const vehiculoBaseSchema = z.object({
   //   errorMap: () => ({ message: "Debe seleccionar un estado válido" }),
   // }),
 
-  tipo: z.enum(["LIGERO", "MEDIANO", "PESADO", "TERAPESADO"], {
-    errorMap: () => ({
-      message: "Debe seleccionar un tipo válido (LIGERO, MEDIANO, PESADO o TERAPESADO)",
-    }),
-  }),
+  tipo: z
+    .string()
+    .min(1, "Debe seleccionar un tipo de vehículo")
+    .refine(
+      (value) => ["LIGERO", "MEDIANO", "PESADO", "TERAPESADO"].includes(value),
+      "Debe seleccionar un tipo de vehículo válido"
+    ),
 });
 
 // Schema para creación (todos los campos requeridos)
