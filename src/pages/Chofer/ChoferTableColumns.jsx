@@ -2,9 +2,23 @@ import { Button } from '@/components/ui/button';
 import { Eye, Edit, Trash2, Phone, Truck, AlertCircle } from "lucide-react";
 import { ArrowUpDown } from 'lucide-react';
 
+// Función para remover acentos y tildes
+const removeAccents = (text) => {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+};
+
+// Función de filtrado personalizada que ignora acentos
+const filterAccentInsensitive = (row, columnId, filterValue) => {
+  const cellValue = row.getValue(columnId);
+  const normalizedCell = removeAccents(String(cellValue || '').toLowerCase());
+  const normalizedFilter = removeAccents(filterValue.toLowerCase());
+  return normalizedCell.includes(normalizedFilter);
+};
+
 export const createChoferColumns = (onEdit, onDelete, onView) => [
   {
     accessorKey: 'nombreCompleto',
+    filterFn: filterAccentInsensitive,
     header: ({ column }) => {
       return (
         <Button
