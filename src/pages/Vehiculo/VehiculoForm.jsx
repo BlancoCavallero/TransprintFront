@@ -54,12 +54,7 @@ export const VehiculoForm = ({
     if (open && defaultValues && mode === 'edit') {
       const normalizeTipo = (tipo) => {
         if (!tipo) return '';
-        const tipoUpper = tipo.toUpperCase();
-        if (tipoUpper === 'LIGERO') return 'Ligero';
-        if (tipoUpper === 'MEDIANO') return 'Mediano';
-        if (tipoUpper === 'PESADO') return 'Pesado';
-        if (tipoUpper === 'TERAPESADO') return 'Terapesado';
-        return tipo;
+        return tipo.toUpperCase();
       };
 
       form.reset({
@@ -179,7 +174,7 @@ export const VehiculoForm = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-bold text-sm">Tipo de Vehículo</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
                       <FormControl>
                         <SelectTrigger style={inputStyle} className="w-full">
                           <SelectValue placeholder="Seleccione un tipo" />
