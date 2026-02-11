@@ -3,6 +3,25 @@ import { Eye, Edit, Trash2, FileText, Calendar, Activity, ExternalLink } from 'l
 import { ArrowUpDown } from 'lucide-react';
 import { backend_url } from '@/configuration/app.config';
 
+const parseFechaVencimiento = (fecha) => {
+  if (!fecha) return 0;
+  if (typeof fecha !== 'string') return 0;
+
+  if (fecha.includes('/')) {
+    const [d, m, y] = fecha.split('/').map((part) => parseInt(part, 10));
+    if (!Number.isFinite(d) || !Number.isFinite(m) || !Number.isFinite(y)) return 0;
+    return Date.UTC(y, m - 1, d);
+  }
+
+  if (fecha.includes('-')) {
+    const [y, m, d] = fecha.split('-').map((part) => parseInt(part, 10));
+    if (!Number.isFinite(d) || !Number.isFinite(m) || !Number.isFinite(y)) return 0;
+    return Date.UTC(y, m - 1, d);
+  }
+
+  return 0;
+};
+
 export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
   {
     accessorKey: 'nombre',
@@ -52,7 +71,8 @@ export const createDocumentacionColumns = (onEdit, onDelete, onView) => [
     },
   },
   {
-    accessorKey: 'fechaVencimiento',
+    id: 'fechaVencimiento',
+    accessorFn: (row) => parseFechaVencimiento(row.fechaVencimiento),
     header: ({ column }) => {
       return (
         <Button
