@@ -33,7 +33,7 @@ const vehiculoBaseSchema = z.object({
 
   tipo: z.enum(["LIGERO", "MEDIANO", "PESADO", "TERAPESADO"], {
     errorMap: () => ({
-      message: "Debe seleccionar un tipo válido (Ligero, Mediano, Pesado o Terapesado)",
+      message: "Debe seleccionar un tipo válido (LIGERO, MEDIANO, PESADO o TERAPESADO)",
     }),
   }),
 });
