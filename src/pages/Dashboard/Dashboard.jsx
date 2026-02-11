@@ -54,8 +54,8 @@ export function Dashboard() {
 
       {/* Sección inferior */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <RecentActivity activities={data.recentActivity} />
         <QuickActions actions={data.quickActions} />
+        <RecentActivity alertas={data.alertas} />
       </div>
     </div>
   );

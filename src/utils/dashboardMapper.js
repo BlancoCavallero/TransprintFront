@@ -1,83 +1,137 @@
 export const mapDashboard = (backendData) => {
-  // Construir alertas dinámicamente, solo mostrando si son > 0
+  // Construir alertas dinámicamente, solo mostrando mantenimientos
   const quickActionsArray = [];
 
-  // Alertas de choferes
-  if (backendData.alertas.choferes.licenciasVencidas > 0) {
+  // Mantenimientos
+  const enCurso = parseInt(backendData.mantenimientosInfo.enCurso) || 0;
+  const pendientes = parseInt(backendData.mantenimientosInfo.pendientes) || 0;
+  const finalizados = parseInt(backendData.mantenimientosInfo.finalizados) || 0;
+  const totalMant = parseInt(backendData.mantenimientosInfo.total) || 0;
+
+  if (enCurso > 0) {
     quickActionsArray.push({
-      id: `chofer-lic-vencidas`,
-      title: `${backendData.alertas.choferes.licenciasVencidas} licencias vencidas`,
-      description: "Renovar licencias",
-      color: "red",
-    });
-  }
-
-  if (backendData.alertas.choferes.licenciasPorVencer > 0) {
-    quickActionsArray.push({
-      id: `chofer-lic-por-vencer`,
-      title: `${backendData.alertas.choferes.licenciasPorVencer} licencias por vencer`,
-      description: "Proximamente serán renovadas",
-      color: "yellow",
-    });
-  }
-
-  // Alertas de vehículos
-  if (backendData.alertas.vehiculos.documentacionVencida > 0) {
-    quickActionsArray.push({
-      id: `vehiculo-doc-vencida`,
-      title: `${backendData.alertas.vehiculos.documentacionVencida} vehículos con documentación vencida`,
-      description: "Actualizar documentación",
-      color: "red",
-    });
-  }
-
-  if (backendData.alertas.vehiculos.documentacionPorVencer > 0) {
-    quickActionsArray.push({
-      id: `vehiculo-doc-por-vencer`,
-      title: `${backendData.alertas.vehiculos.documentacionPorVencer} vehículos con documentación por vencer`,
-      description: "Revisar documentación",
-      color: "yellow",
-    });
-  }
-
-  // Construir actividad reciente de mantenimientos
-  const recentActivityArray = [];
-
-  if (backendData.mantenimientosInfo.finalizados > 0) {
-    recentActivityArray.push({
-      id: 1,
-      title: `Mantenimientos finalizados: ${backendData.mantenimientosInfo.finalizados}`,
-      time: "Actualizado recientemente",
-      color: "green",
-    });
-  }
-
-  if (backendData.mantenimientosInfo.enProgreso > 0) {
-    recentActivityArray.push({
-      id: 2,
-      title: `Mantenimientos en progreso: ${backendData.mantenimientosInfo.enProgreso}`,
-      time: "En desarrollo",
+      id: `mant-en-curso`,
+      title: `${enCurso} mantenimiento${enCurso !== 1 ? 's' : ''} en curso`,
+      description: "En desarrollo",
       color: "blue",
     });
   }
 
-  if (backendData.mantenimientosInfo.pendientes > 0) {
-    recentActivityArray.push({
-      id: 3,
-      title: `Mantenimientos pendientes: ${backendData.mantenimientosInfo.pendientes}`,
-      time: "Sin iniciar",
+  if (pendientes > 0) {
+    quickActionsArray.push({
+      id: `mant-pendientes`,
+      title: `${pendientes} mantenimiento${pendientes !== 1 ? 's' : ''} pendiente${pendientes !== 1 ? 's' : ''}`,
+      description: "Sin iniciar",
       color: "yellow",
     });
   }
 
-  if (backendData.mantenimientosInfo.cancelados > 0) {
-    recentActivityArray.push({
-      id: 4,
-      title: `Mantenimientos cancelados: ${backendData.mantenimientosInfo.cancelados}`,
-      time: "Cancelado",
-      color: "red",
+  if (finalizados > 0) {
+    quickActionsArray.push({
+      id: `mant-finalizados`,
+      title: `${finalizados} mantenimiento${finalizados !== 1 ? 's' : ''} finalizado${finalizados !== 1 ? 's' : ''}`,
+      description: "Completados",
+      color: "green",
     });
   }
+
+  if (totalMant > 0) {
+    quickActionsArray.push({
+      id: `mant-total`,
+      title: `Total: ${totalMant} mantenimiento${totalMant !== 1 ? 's' : ''}`,
+      description: "Total registrados",
+      color: "gray",
+    });
+  }
+
+  // Construir alertas de choferes y vehículos sin repetir
+  const alertasArray = [];
+  const choferesVistos = new Set();
+  const vehiculosVistos = new Set();
+
+  // Procesar choferes con licencias vencidas
+  const choferesVencidas = backendData.alertas.choferes.vencidasPertenecenA || [];
+  const choferesPorVencer = backendData.alertas.choferes.porVencerPertenecenA || [];
+
+  // Combinar ambos arrays de choferes
+  const todosChoferes = [...choferesVencidas, ...choferesPorVencer];
+
+  todosChoferes.forEach((chofer) => {
+    if (!choferesVistos.has(chofer.idChofer)) {
+      choferesVistos.add(chofer.idChofer);
+      
+      const vencidas = parseInt(chofer.licenciasVencidas) || 0;
+      const porVencer = parseInt(chofer.licenciasPorVencer) || 0;
+      
+      let status = "";
+      let color = "blue";
+      
+      if (vencidas > 0 && porVencer > 0) {
+        status = `${vencidas} vencida(s), ${porVencer} por vencer`;
+        color = "red";
+      } else if (vencidas > 0) {
+        status = `${vencidas} vencida(s)`;
+        color = "red";
+      } else if (porVencer > 0) {
+        status = `${porVencer} por vencer`;
+        color = "yellow";
+      }
+
+      alertasArray.push({
+        id: `chofer-${chofer.idChofer}`,
+        tipo: "chofer",
+        title: `${chofer.nombre} ${chofer.apellido}`,
+        description: status,
+        color: color,
+      });
+    }
+  });
+
+  // Procesar vehículos con documentación vencida o por vencer
+  const vehiculosVencidos = backendData.alertas.vehiculos.vencidasPertenecenAl || [];
+  const vehiculosPorVencer = backendData.alertas.vehiculos.porVencerPertenecenAl || [];
+
+  // Combinar ambos arrays de vehículos
+  const todosVehiculos = [...vehiculosVencidos, ...vehiculosPorVencer];
+
+  todosVehiculos.forEach((vehiculo) => {
+    if (!vehiculosVistos.has(vehiculo.idVehiculo)) {
+      vehiculosVistos.add(vehiculo.idVehiculo);
+      
+      const vencidas = parseInt(vehiculo.documentacionVencida) || 0;
+      const porVencer = parseInt(vehiculo.documentacionPorVencer) || 0;
+      
+      let status = "";
+      let color = "blue";
+      
+      if (vencidas > 0 && porVencer > 0) {
+        status = `${vencidas} vencida(s), ${porVencer} por vencer`;
+        color = "red";
+      } else if (vencidas > 0) {
+        status = `${vencidas} vencida(s)`;
+        color = "red";
+      } else if (porVencer > 0) {
+        status = `${porVencer} por vencer`;
+        color = "yellow";
+      }
+
+      alertasArray.push({
+        id: `vehiculo-${vehiculo.idVehiculo}`,
+        tipo: "vehiculo",
+        title: `Vehículo ${vehiculo.patente}`,
+        description: status,
+        color: color,
+      });
+    }
+  });
+
+  // Datos de mantenimientos para la card
+  const mantenimientosData = {
+    enCurso: parseInt(backendData.mantenimientosInfo.enCurso) || 0,
+    pendientes: parseInt(backendData.mantenimientosInfo.pendientes) || 0,
+    finalizados: parseInt(backendData.mantenimientosInfo.finalizados) || 0,
+    total: parseInt(backendData.mantenimientosInfo.total) || 0,
+  };
 
   // Obtener choferes disponibles, con fallback si no existe
   const driversAvailable = backendData.totalChoferes.disponibles ?? backendData.totalChoferes.habilitados ?? 0;
@@ -93,14 +147,17 @@ export const mapDashboard = (backendData) => {
 
     tripsInProgress: backendData.viajesEnCurso,
 
-    recentActivity: recentActivityArray.length > 0 ? recentActivityArray : [
+    alertas: alertasArray.length > 0 ? alertasArray : [
       {
         id: 0,
-        title: "Sin mantenimientos registrados",
-        time: "-",
+        tipo: "info",
+        title: "Sin alertas pendientes",
+        description: "Todo en orden",
         color: "blue",
       },
     ],
+
+    mantenimientos: mantenimientosData,
 
     quickActions: quickActionsArray.length > 0 ? quickActionsArray : [
       {

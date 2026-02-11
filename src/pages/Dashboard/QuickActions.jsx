@@ -5,6 +5,8 @@ export function QuickActions({ actions }) {
     red: "bg-red-50 border border-red-300 text-red-800",
     yellow: "bg-yellow-50 border border-yellow-300 text-yellow-800",
     blue: "bg-blue-50 border border-blue-300 text-blue-800",
+    green: "bg-green-50 border border-green-300 text-green-800",
+    gray: "bg-gray-50 border border-gray-400 text-gray-900 font-bold",
   };
 
   return (
@@ -13,10 +15,10 @@ export function QuickActions({ actions }) {
       <CardHeader style={{ padding: '20px', paddingBottom: '10px' }} className="border-none shadow-none">
         <div className="flex justify-between items-baseline w-full">
           <CardTitle className="text-base font-bold">
-            Acciones Rápidas
+            Mantenimientos
           </CardTitle>
           <span className="text-xs text-muted-foreground italic">
-            Tareas importantes pendientes
+           Listado de mantenimientos
           </span>
         </div>
       </CardHeader>
