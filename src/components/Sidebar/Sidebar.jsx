@@ -1,6 +1,7 @@
 import { SidebarList } from "./SidebarList/SidebarList";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import logoTransprint from "../../assets/images/logoTransprint.png";
 import "./sidebar.css";
 import { 
   FaChartBar,
@@ -88,7 +89,11 @@ const Sidebar = ({ isCollapsed, toggleSidebar, isMobile }) => {
             className="siderbar__logo"
             onClick={isMobile ? toggleSidebar : undefined}
           >
-            <p>Transprint SRL</p>
+            <img
+              src={logoTransprint}
+              alt="Transprint SRL"
+              className="sidebar__logo-img"
+            />
           </Link>
         </div>
         <SidebarList
