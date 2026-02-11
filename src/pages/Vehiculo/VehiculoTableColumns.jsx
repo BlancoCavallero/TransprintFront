@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, Tag, Truck, Activity } from 'lucide-react';
+import { Eye, Edit, Trash2, Tag, Truck, Activity, RotateCcw } from 'lucide-react';
 import { ArrowUpDown } from 'lucide-react';
 
-export const createVehiculoColumns = (onEdit, onDelete, onView) => [
+export const createVehiculoColumns = (onEdit, onDelete, onView, onReactivar, loadingReactivar) => [
   {
     accessorKey: 'patente',
     header: ({ column }) => {
@@ -92,6 +92,7 @@ export const createVehiculoColumns = (onEdit, onDelete, onView) => [
     header: 'Acciones',
     cell: ({ row }) => {
       const vehiculo = row.original;
+      const isDeBaja = vehiculo.estadoDisponibilidad === 'DE_BAJA';
 
       return (
         <div className="flex items-center gap-2">
@@ -113,15 +114,28 @@ export const createVehiculoColumns = (onEdit, onDelete, onView) => [
           >
             <Edit className="h-4 w-4 text-yellow-600" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 hover:bg-red-50"
-            onClick={() => onDelete(vehiculo)}
-            title="Eliminar"
-          >
-            <Trash2 className="h-4 w-4 text-red-600" />
-          </Button>
+          {isDeBaja ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-green-50"
+              onClick={() => onReactivar && onReactivar(vehiculo)}
+              disabled={loadingReactivar}
+              title="Reactivar vehiculo"
+            >
+              <RotateCcw className="h-4 w-4 text-green-600" />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-red-50"
+              onClick={() => onDelete(vehiculo)}
+              title="Dar de baja"
+            >
+              <Trash2 className="h-4 w-4 text-red-600" />
+            </Button>
+          )}
         </div>
       );
     },

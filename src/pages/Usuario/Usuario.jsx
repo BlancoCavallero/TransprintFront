@@ -106,7 +106,7 @@ export const Usuario = () => {
             Gestiona todos tus usuarios desde aquí
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px',  flexWrap: 'wrap' }}>
           <Button 
             variant="outline" 
             onClick={() => refetch()} 

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Eye, Edit, Trash2, Phone, Truck, AlertCircle } from "lucide-react";
+import { Eye, Edit, Trash2, Phone, Truck, AlertCircle, RotateCcw } from "lucide-react";
 import { ArrowUpDown } from 'lucide-react';
 
 // Función para remover acentos y tildes
@@ -15,7 +15,7 @@ const filterAccentInsensitive = (row, columnId, filterValue) => {
   return normalizedCell.includes(normalizedFilter);
 };
 
-export const createChoferColumns = (onEdit, onDelete, onView) => [
+export const createChoferColumns = (onEdit, onDelete, onView, onReactivar, loadingReactivar) => [
   {
     accessorKey: 'nombreCompleto',
     filterFn: filterAccentInsensitive,
@@ -95,6 +95,7 @@ export const createChoferColumns = (onEdit, onDelete, onView) => [
     header: 'Acciones',
     cell: ({ row }) => {
       const chofer = row.original;
+      const isDeBaja = chofer.estadoDisponibilidad === 'DE_BAJA';
 
       return (
         <div className="flex items-center gap-2">
@@ -116,15 +117,28 @@ export const createChoferColumns = (onEdit, onDelete, onView) => [
           >
             <Edit className="h-4 w-4 text-yellow-600" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 hover:bg-red-50"
-            onClick={() => onDelete(chofer)}
-            title="Eliminar"
-          >
-            <Trash2 className="h-4 w-4 text-red-600" />
-          </Button>
+          {isDeBaja ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-green-50"
+              onClick={() => onReactivar && onReactivar(chofer)}
+              disabled={loadingReactivar}
+              title="Reactivar chofer"
+            >
+              <RotateCcw className="h-4 w-4 text-green-600" />
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-red-50"
+              onClick={() => onDelete(chofer)}
+              title="Dar de baja"
+            >
+              <Trash2 className="h-4 w-4 text-red-600" />
+            </Button>
+          )}
         </div>
       );
     },

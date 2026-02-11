@@ -119,7 +119,13 @@ export const Chofer = () => {
     }
   };
 
-  const columns = createChoferColumns(handleEditClick, handleDeleteClick, handleViewClick);
+  const columns = createChoferColumns(
+    handleEditClick,
+    handleDeleteClick,
+    handleViewClick,
+    handleReactivarChofer,
+    loadingReactivar
+  );
 
   if (loading && !choferes.length) {
     return (
@@ -136,7 +142,7 @@ export const Chofer = () => {
           <h1 className="text-3xl font-bold tracking-tight">Choferes</h1>
           <p className="text-muted-foreground">Gestiona todos tus choferes desde aquí</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Button 
             variant="outline" 
             onClick={refetch} 

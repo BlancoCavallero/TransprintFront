@@ -24,8 +24,8 @@ export const MantenimientoDetailDialog = ({ open, onOpenChange, mantenimiento })
     const tipoLower = tipo.toLowerCase();
     if (tipoLower === 'ligero') return 'bg-blue-100 text-blue-700 border-blue-200';
     if (tipoLower === 'mediano') return 'bg-purple-100 text-purple-700 border-purple-200';
-    if (tipoLower === 'pesado') return 'bg-purple-100 text-purple-700 border-purple-200';
-    if (tipoLower === 'terapesado') return 'bg-purple-100 text-purple-700 border-purple-200';
+    if (tipoLower === 'pesado') return 'bg-indigo-100 text-indigo-700 border-indigo-200';
+    if (tipoLower === 'terapesado') return 'bg-teal-100 text-teal-700 border-teal-200';
     return 'bg-gray-100 text-gray-700 border-gray-200';
   };
 

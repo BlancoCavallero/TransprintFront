@@ -114,7 +114,7 @@ export const Viaje = () => {
             Gestiona la logística y el seguimiento de los viajes.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <Button 
             variant="outline" 
             onClick={refetch} 

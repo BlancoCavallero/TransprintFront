@@ -121,7 +121,7 @@ export const Mantenimiento = () => {
             Gestiona todos los mantenimientos desde aquí
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px',  flexWrap: 'wrap'  }}>
           <Button 
             variant="outline" 
             onClick={() => refetch()} 

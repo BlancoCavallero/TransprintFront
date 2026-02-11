@@ -126,7 +126,9 @@ export const Vehiculo = () => {
   const columns = createVehiculoColumns(
     handleEditClick,
     handleDeleteClick,
-    handleViewClick
+    handleViewClick,
+    handleReactivarVehiculo,
+    loadingReactivar
   );
 
   if (loading && !vehiculos.length) {
@@ -144,7 +146,7 @@ export const Vehiculo = () => {
           <h1 className="text-3xl font-bold tracking-tight">Vehículos</h1>
           <p className="text-muted-foreground">Gestiona todos tus vehículos desde aquí</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px' ,  flexWrap: 'wrap' }}>
           <Button 
             variant="outline" 
             onClick={refetch} 

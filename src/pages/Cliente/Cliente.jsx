@@ -148,7 +148,7 @@ export const Cliente = () => {
           <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
           <p className="text-muted-foreground">Gestiona todos tus clientes desde aquí</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px' , flexWrap: 'wrap'}}>
           <Button 
             variant="outline" 
             onClick={() => refetch()} 
