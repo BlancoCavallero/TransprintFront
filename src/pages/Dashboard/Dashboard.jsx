@@ -38,7 +38,7 @@ export function Dashboard() {
           Dashboard
         </h1>
         <p className="text-sm text-muted-foreground">
-          Bienvenido, Administrador
+          Bienvenido
         </p>
       </div>
 
