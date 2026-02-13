@@ -23,7 +23,7 @@ export const Header = ({ toggleSidebar, isCollapsed }) => {
               cursor: "pointer",
             }}
           >
-            <span className="header__span">Transprint</span>
+            <span className="header__span"></span>
           </a>
         </div>
       </div>

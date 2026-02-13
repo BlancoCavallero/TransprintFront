@@ -43,7 +43,11 @@ export const createViajeColumns = (onEdit, onDelete, onView) => [
   },
   {
     id: 'ruta',
-    header: 'Ruta',
+    accessorFn: (row) => {
+      const origen = row.localidadOrigen?.nombre || ``;
+      const destino = row.localidadDestino?.nombre || ``;
+      return `${origen} ${destino}`.trim();
+    },
     cell: ({ row }) => {
       const viaje = row.original;
       const origen = viaje.localidadOrigen?.nombre || `Loc. ${viaje.idLocalidadOrigen}`;
